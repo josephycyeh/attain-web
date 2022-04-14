@@ -1,0 +1,18 @@
+query GetItems($getItemsInput: GetItemsInput) {
+  items(getItemsInput: $getItemsInput) {
+    id
+    sku
+    description
+    sell_size
+    unit_size
+    case_cost
+    profit_margin
+    srp
+    upc1
+    upc2
+    nacs_category
+    nacs_subcategory
+    image
+  }
+}
+

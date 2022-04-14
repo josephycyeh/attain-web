@@ -1,0 +1,22 @@
+mutation UpdateItemInCart($updateItemInCartInput: UpdateItemInCartInput!) {
+  updateItemInCart(updateItemInCartInput: $updateItemInCartInput) {
+    id
+    cartItems {
+      id
+      sku
+      description
+      unit_size
+      sell_size
+      case_cost
+      profit_margin
+      srp
+      upc1
+      upc2
+      nacs_category
+      nacs_subcategory
+      quantity
+      item_id
+    }
+    subtotal
+  }
+}

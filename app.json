@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "attain-mobile",
-    "slug": "attain-mobile",
-    "version": "1.0.0",
+    "name": "Attain Wholesale",
+    "slug": "Attain",
+    "version": "3.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "joinattain.com",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,13 +18,25 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "buildNumber": "12",
+      "icon": "./applogo.png",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera in order to scan items/products.",
+        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
+      },
+      "bundleIdentifier": "joinattain.com"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "joinattain.com"
     },
     "web": {
       "favicon": "./assets/favicon.png"

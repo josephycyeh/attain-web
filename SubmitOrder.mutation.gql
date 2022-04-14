@@ -1,0 +1,7 @@
+mutation SubmitOrder($submitOrderInput: SubmitOrderInput!) {
+  submitOrder(submitOrderInput: $submitOrderInput) {
+    id
+    status
+    subtotal
+  }
+}
