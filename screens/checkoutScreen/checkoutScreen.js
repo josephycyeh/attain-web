@@ -1,11 +1,11 @@
-import react, {useEffect, useState} from 'react';
+import react, {useEffect, useState, useContext} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image, } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useGetCartsQuery, useSubmitOrderMutation } from '../../generated/graphql'
-
+import { UserContext } from '../../context/userContext'
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -151,29 +151,39 @@ const styles = StyleSheet.create({
   });
   
 export default function CheckoutScreen({ navigation, route}) {
+    const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
+
+    const [submitOrder, {loading:submitOrderLoading, data:submitOrderData, error:submitOrderError}] = useSubmitOrderMutation()
+
+    const {cartId } = route.params
     const {loading:getCartsLoading, data:getCartsData, error:getCartsError} = useGetCartsQuery({
         fetchPolicy:"network-only",
         variables: {
             getCartsInput: {
-                ids: ["1"]
+                userId: user.id
             },
         },
         pollInterval: 500
     })
-    const [submitOrder, {loading:submitOrderLoading, data:submitOrderData, error:submitOrderError}] = useSubmitOrderMutation()
-    const {cartId } = route.params
     const onBackToScanPressed = () => {
         navigation.goBack()
     }
     const submitOrderClicked = () => {
-        console.log(cartId)
-        submitOrder({
-            variables: {
-                submitOrderInput: {
-                    cartId: cartId
+        try {
+            console.log(user.id)
+            submitOrder({
+                variables: {
+                    submitOrderInput: {
+                        cartId: cartId,
+                        userId: user.id
+                    }
                 }
-            }
-        })
+            })
+        }
+        catch(err) {
+
+        }
+        
         navigation.navigate("OrderSubmittedScreen")
     }
 

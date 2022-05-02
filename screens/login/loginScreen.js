@@ -1,5 +1,5 @@
 import react, {useEffect, useState, useContext} from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image, Alert, Platform } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image, Alert, Platform, TextInput } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -11,25 +11,11 @@ import { InstantSearch, connectStateResults } from 'react-instantsearch-native';
 import SearchBox from '../../components/SearchBox';
 import InfiniteHits from '../../components/InfiniteHits';
 
-import Auth0 from 'react-native-auth0';
-const auth0 = new Auth0({ domain: 'dev-wlkiowyr.us.auth0.com', clientId: 'V3IvmHMMWxOkpW2YtLtXoSvDgMB0tOaO' });
-import * as AuthSession from 'expo-auth-session';
 
-import jwtDecode from 'jwt-decode';
-import axios from 'axios';
 import { UserContext } from '../../context/userContext'
-import * as SecureStore from 'expo-secure-store';
-async function save(key, value) {
-  await SecureStore.setItemAsync(key, value);
-}
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 
-const auth0ClientId = "V3IvmHMMWxOkpW2YtLtXoSvDgMB0tOaO";
-const authorizationEndpoint = "https://dev-wlkiowyr.us.auth0.com/authorize";
-
-
-const useProxy = Platform.select({ web: false, default: true });
-const redirectUri = AuthSession.makeRedirectUri({ useProxy });
 
 const styles = StyleSheet.create({
     container: {
@@ -40,9 +26,15 @@ const styles = StyleSheet.create({
     safeContainer: {
         marginHorizontal: 0,
         flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        flex: 1
+        justifyContent:"center",
+        flex: 1,
+
+    },
+    credentialsContainer: {
+
+        height: "75%",
+        flexDirection: "column",
+        alignItems:"center"
     },
     tinyLogo: {
       width: 50,
@@ -112,19 +104,26 @@ const styles = StyleSheet.create({
         fontWeight: "600"
     },
     signInButton: {
-        position: "absolute",
-        bottom: 0,
-        marginBottom: 30,
+
+
         backgroundColor: "#3C95FF",
         width: "80%",
         height: 40,
         justifyContent: "center",
         alignItems:"center",
-        flex: 1
+        borderRadius: 10
     },
     logoImage: {
         width: 80,
         height: 70
+    },
+    credentialsInput: {
+        width: "80%",
+        height: 45,
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 10
     }
   });
   const searchClient = algoliasearch(
@@ -145,68 +144,62 @@ const styles = StyleSheet.create({
   
 export default function LoginScreen({ navigation, route }) {
     const { isLoggedIn, setIsLoggedIn } = useContext(UserContext)
-    const [request, result, promptAsync] = AuthSession.useAuthRequest(
-        {
-          redirectUri,
-          clientId: auth0ClientId,
-          // id_token will return a JWT token
-          responseType: 'token',
-          // retrieve the user's profile
-          scopes: ['openid', 'profile', 'email', 'user_metadata'],
-          extraParams: {
-            // ideally, this will be a random value
-            nonce: 'nonce',
-          },
-        },
-        { authorizationEndpoint }
-      );
-    const goToItemDetail = (item) => {
-        navigation.navigate("ItemDetail", {
-           upcCode: item.upc1 
-        })
-    }
+    const [credentials, setCredentials] = useState({
+        username: "",
+        password: ""
+    })
 
-    const signInButtonPressed = () => {
-        promptAsync({ useProxy })
-    }
+    const onChangeText = (type, text) => {
+        
+        const temp = {...credentials}
+        temp[type] = text
+        setCredentials(temp)
 
-    useEffect(async () => {
-        if (result && result.type == "success") {
-            save("access_token", result.params.access_token)
+    }
+    const auth = getAuth();
+
+    const signInButtonPressed = async () => {
+        const email = credentials.username + "@joinattain.com"
+        console.log(email)
+        const password = credentials.password
+        signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            
+            const user = userCredential.user;
             setIsLoggedIn(true)
-            const userProfile = await getUserProfile(result.params.access_token)
-            console.log(userProfile)
-            
-            
-        }
-    }, [result])
-
-    const getUserProfile = async (access_token) => {
-        try {
-            console.log(access_token)
-            const userInfo = await axios.get('https://dev-wlkiowyr.us.auth0.com/userinfo', {headers: {"Authorization": `Bearer ${access_token}`, "Content-Type": "application/json"}})
-            return userInfo.data
-        }
-        catch(err) {
-             console.log(err)
-             console.log(err.message)
-        }
-       
-       
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(error.message)
+        });
     }
+
+
+
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.safeContainer}>
+            <View style={styles.credentialsContainer}>
+
+           
             <Image
         style={styles.logoImage}
         source={require('../../assets/logo.png')}
       />
                 <Text style={styles.boldHeaderText}>Attain</Text>
-                <Text style={[styles.boldMainText, {marginBottom: 75}]}>Your one-stop shop for inventory</Text>
-                <TouchableOpacity style={styles.signInButton} onPress={signInButtonPressed}>
+                <Text style={[styles.boldMainText, {marginBottom: 50}]}>Your one-stop shop for inventory</Text>
+
+              
+                <TextInput style={[styles.credentialsInput, {marginBottom: 10}]} placeholder="username" onChangeText={(text) => onChangeText("username", text)} autoCapitalize='none' value={credentials.username} ></TextInput>
+                <TextInput style={[styles.credentialsInput, {marginBottom: 10}]} placeholder="password" onChangeText={(text) => onChangeText("password", text)}  autoCapitalize='none' value={credentials.password} secureTextEntry={true} autoCorrect={false}></TextInput>
+    
+                <TouchableOpacity style={[styles.signInButton, {marginTop: 50}]} onPress={signInButtonPressed}>
                 <Text style={[styles.boldSecondaryText, {color:"white"}]}>Sign In</Text>
 
                 </TouchableOpacity>
+            </View>
             </View>
         </SafeAreaView>
     )

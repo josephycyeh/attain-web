@@ -5,6 +5,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import ItemDetailScreen from '../itemDetailScreen/itemDetailScreen'
+const opacity = 'rgba(0, 0, 0, .6)';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -33,7 +35,30 @@ const styles = StyleSheet.create({
   },
   innerContainerView: {
     marginTop: 20
-  }
+  },
+  layerTop: {
+    flex: 1,
+    backgroundColor: opacity
+  },
+  layerCenter: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  layerLeft: {
+    flex: 1,
+    backgroundColor: opacity
+  },
+  focused: {
+    flex: 10
+  },
+  layerRight: {
+    flex: 1,
+    backgroundColor: opacity
+  },
+  layerBottom: {
+    flex: 1,
+    backgroundColor: opacity
+  },
 });
 
 
@@ -76,7 +101,15 @@ function ScannerScreenComponent({ navigation }) {
         <BarCodeScanner
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
           style={StyleSheet.absoluteFillObject}
-        />
+        >
+           <View style={styles.layerTop} />
+        <View style={styles.layerCenter}>
+          <View style={styles.layerLeft} />
+          <View style={styles.focused} />
+          <View style={styles.layerRight} />
+        </View>
+        <View style={styles.layerBottom} />
+        </BarCodeScanner>
         
       </View>
     );

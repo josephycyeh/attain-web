@@ -58,7 +58,8 @@ export type CreateTable = {
 };
 
 export type GetCartsInput = {
-  ids: Array<InputMaybe<Scalars['ID']>>;
+  ids?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
+  userId: Scalars['ID'];
 };
 
 export type GetItemsInput = {
@@ -69,6 +70,10 @@ export type GetItemsInput = {
 export type GetOrdersInput = {
   ids?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
   userId: Scalars['ID'];
+};
+
+export type GetUsersInput = {
+  ids?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
 };
 
 export type Item = {
@@ -129,6 +134,7 @@ export type Query = {
   carts: Array<Maybe<Cart>>;
   items: Array<Maybe<Item>>;
   orders: Array<Maybe<Order>>;
+  users: Array<Maybe<User>>;
 };
 
 
@@ -146,14 +152,27 @@ export type QueryOrdersArgs = {
   getOrdersInput?: InputMaybe<GetOrdersInput>;
 };
 
+
+export type QueryUsersArgs = {
+  getUsersInput?: InputMaybe<GetUsersInput>;
+};
+
 export type SubmitOrderInput = {
   cartId: Scalars['ID'];
+  userId: Scalars['ID'];
 };
 
 export type UpdateItemInCartInput = {
   cartId: Scalars['ID'];
   itemId: Scalars['ID'];
   quantity: Scalars['Int'];
+};
+
+export type User = {
+  __typename?: 'User';
+  email?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
 };
 
 export type GetCartsQueryVariables = Exact<{
@@ -176,6 +195,13 @@ export type GetOrdersQueryVariables = Exact<{
 
 
 export type GetOrdersQuery = { __typename?: 'Query', orders: Array<{ __typename?: 'Order', id: string, status: string, subtotal: number, date_submitted?: number | null, orderItems?: Array<{ __typename?: 'CartItem', id: string, sku: string, description: string, sell_size: string, unit_size: number, case_cost: number, profit_margin: number, srp: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, quantity: number, item_id: number, image?: string | null } | null> | null } | null> };
+
+export type GetUsersQueryVariables = Exact<{
+  getUsersInput?: InputMaybe<GetUsersInput>;
+}>;
+
+
+export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, name?: string | null } | null> };
 
 export type SubmitOrderMutationVariables = Exact<{
   submitOrderInput: SubmitOrderInput;
@@ -346,6 +372,42 @@ export function useGetOrdersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
 export type GetOrdersQueryHookResult = ReturnType<typeof useGetOrdersQuery>;
 export type GetOrdersLazyQueryHookResult = ReturnType<typeof useGetOrdersLazyQuery>;
 export type GetOrdersQueryResult = Apollo.QueryResult<GetOrdersQuery, GetOrdersQueryVariables>;
+export const GetUsersDocument = gql`
+    query GetUsers($getUsersInput: GetUsersInput) {
+  users(getUsersInput: $getUsersInput) {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetUsersQuery__
+ *
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersQuery({
+ *   variables: {
+ *      getUsersInput: // value for 'getUsersInput'
+ *   },
+ * });
+ */
+export function useGetUsersQuery(baseOptions?: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+      }
+export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, options);
+        }
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
+export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
 export const SubmitOrderDocument = gql`
     mutation SubmitOrder($submitOrderInput: SubmitOrderInput!) {
   submitOrder(submitOrderInput: $submitOrderInput) {

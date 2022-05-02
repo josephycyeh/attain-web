@@ -7,40 +7,20 @@ import algoliasearch from 'algoliasearch';
 import { InstantSearch, connectStateResults } from 'react-instantsearch-native';
 import SearchBox from '../../components/SearchBox';
 import InfiniteHits from '../../components/InfiniteHits';
-import { useGetItemsQuery, useGetOrdersQuery, useUpdateItemInCartMutation, useAddItemToCartMutation } from '../../generated/graphql'
+import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation } from '../../generated/graphql'
 import ItemDetailScreen from '../itemDetailScreen/itemDetailScreen'
 import OrderDetailScreen from '../orderDetailScreen/orderDetailScreen'
 
 import SearchResultsScreen from '../searchResultsScreen/searchResultsScreen'
 
 import { Ionicons } from '@expo/vector-icons';
-import * as AuthSession from 'expo-auth-session';
-import { openAuthSessionAsync } from 'expo-web-browser';
+
 
 import axios from "axios"
-import * as Linking from 'expo-linking';
-import * as SecureStore from 'expo-secure-store';
+
+
 import { UserContext } from '../../context/userContext'
-async function save(key, value) {
-  await SecureStore.setItemAsync(key, value);
-}
-
-async function deleteKey(key) {
-  await SecureStore.deleteItemAsync(key);
-}
-
-async function getValueFor(key) {
-  let result = await SecureStore.getItemAsync(key);
-  return result
-}
-
-const auth0ClientId = "V3IvmHMMWxOkpW2YtLtXoSvDgMB0tOaO";
-const authorizationEndpoint = "https://dev-wlkiowyr.us.auth0.com/v2/logout";
-
-const useProxy = Platform.select({ web: false, default: true });
-
-
-const redirectUri = AuthSession.makeRedirectUri({ useProxy }); // <-- must be set in allowed logout urls
+import { getAuth, signOut } from "firebase/auth";
 
 const searchClient = algoliasearch(
   'latency',
@@ -139,7 +119,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "black",
-    width: 155,
+    width: 170,
     height: 230,
     marginVertical:10,
     padding: 5,
@@ -181,30 +161,58 @@ const styles = StyleSheet.create({
     backgroundColor: "#3C95FF", 
     flexDirection: "row",
     justifyContent: "center",
+    alignItems:"center",
     padding: 20
   },
   searchBar: {
     width: "100%",
     height: 40,
     backgroundColor: "white",
-    flexDirection: "column",
-    justifyContent: "center",
+    flexDirection: "row",
+    justifyContent: "flex-start",
     padding: 10
     
+  },
+  searchBarInsideView: {
+
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems:"center"
+  },
+
+  mutedBodyText: {
+    fontSize: 15,
+    color: "#313233",
+
+
   }
 });
 
 function HomeComponent({ navigation }) {
-  const { isLoggedIn, setIsLoggedIn } = useContext(UserContext)
+  const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
+
+  const auth = getAuth();
+
   const {loading:getOrdersLoading, data:getOrdersData, error:getOrdersError} = useGetOrdersQuery({
     fetchPolicy:"network-only",
     variables: {
         getOrdersInput: {
-            userId: 1
+            userId: user.id
         },
     },
     pollInterval: 500
 })
+
+const {loading:getCartsLoading, data:getCartsData, error: getCartsError} = useGetCartsQuery({
+  fetchPolicy:"network-only",
+  variables: {
+      getCartsInput: {
+          userId: user.id
+      },
+  },
+  pollInterval: 500
+})
+
 const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = useGetItemsQuery({ 
   fetchPolicy: 'network-only',
   variables: { getItemsInput: {
@@ -215,13 +223,18 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
   } }})
 
 
+  const [updateItemInCart, {loading:updateItemInCartLoading, data:updateItemInCartData, error:updateItemInCartError}] = useUpdateItemInCartMutation()
+
+
+
+  if (getCartsLoading && !getCartsData) return <Text>Loading</Text>
+  if (getCartsError) return <Text>{getCartsError.message}</Text>
+
   if (getOrdersLoading && !getOrdersData) return <Text>Loading</Text>
   if (getOrdersError) return <Text>{getOrdersError.message}</Text>
 
   if (getItemsLoading && !getItemsData) return <Text>Loading</Text>
   if (getItemsError) return <Text>{getItemsError.message}</Text>
-  console.log(getItemsData.items[0].image)
-
   const itemClicked = (item) => {
     navigation.navigate("ItemDetail", {
       upcCode: item.upc1
@@ -237,38 +250,8 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
 
 
   const logoutButtonPressed = async () => {
-    try {
-
-      const redirectUrl = Linking.createURL("logout-url");
-    
-      const result = await openAuthSessionAsync(`${authorizationEndpoint}?client_id=${auth0ClientId}&returnTo=${redirectUrl}`);
-      
-      if (result.type == "success") {
-        deleteKey('access_token')
-        setIsLoggedIn(false) 
-      }
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-     
-
-    }
-    catch(err) {
-      console.log(err.message)
-    }
-    
+    await signOut(auth)
   }
-
-
 
 
 
@@ -277,6 +260,25 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
   const searchBarPressed = () => {
     navigation.navigate("SearchResults")
   }
+
+
+  const cart = getCartsData.carts[0]
+  const addItemToCart = (item) => {
+    var quantityToBeUpdated = 1
+    const checkItemId = cartItem => cartItem.item_id == item.id
+    if (cart.cartItems.some(checkItemId)) {
+        quantityToBeUpdated += cart.cartItems.find(cartItem => cartItem.item_id == item.id).quantity
+    }
+    updateItemInCart({
+        variables: {
+            updateItemInCartInput: {
+                cartId: cart.id,
+                itemId: item.id, 
+                quantity: quantityToBeUpdated
+            }
+        }
+    })
+}
 
   return (
    <View style={styles.homeContainer}>
@@ -289,14 +291,19 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
            <View style={styles.topBarView}>
       <View style={styles.titleView}>
         <Text style={styles.boldSecondaryText}>Attain</Text>
-        <Text style={styles.boldText}>Pete's Gas</Text>
+        <Text style={styles.boldText}>{user.name}</Text>
         <TouchableOpacity style={{position:"absolute", top: 30, right: 30}} onPress={logoutButtonPressed}>
           <Text>Logout</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.searchBarContainer}>
       <TouchableOpacity style={styles.searchBar} onPress={searchBarPressed}>
-      <Ionicons name="search" size={24} color="black" />
+      <View style={styles.searchBarInsideView}>
+      <Ionicons name="search" size={24} color="black"/>
+      <Text style={[styles.mutedBodyText, {marginTop:3}]}>
+        Search
+      </Text>
+      </View>
       </TouchableOpacity>
       </View>
       
@@ -314,11 +321,11 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
           </Text>
 
           <Text style={[styles.mutedBodyTextSmall, {marginBottom: 10}]}>
-            Click To See Detail
+            {getOrdersData.orders.length > 1 ? "Click To See Detail" : "No orders yet"} 
           </Text>
+        
     <ScrollView style={styles.scrollView} horizontal={true}> 
       {getOrdersData.orders.map((order) => {
-        console.log(order.date_submitted)
         return (
           
           <TouchableOpacity style={styles.orderView} key={order.id} onPress={() => orderPressed(order)}> 
@@ -372,7 +379,7 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
              <Text style={styles.mutedBodyTextExtraSmall}>Unit Size: {item.unit_size}</Text>
              <View style={{flexDirection: "row", justifyContent: "space-between"}}>
              <Text style={[styles.boldBodyText, {marginTop: 5}]}>${item.case_cost}</Text>
-             <TouchableOpacity style={styles.addToCartButton}>
+             <TouchableOpacity style={styles.addToCartButton} onPress={() => addItemToCart(item)}>
               <Ionicons style={{textAlign:"center"}} name="add" size={24} color="black" />
              </TouchableOpacity>
              </View>
@@ -405,7 +412,7 @@ export default function HomeScreen() {
           <HomeStack.Screen name="Attain" component={HomeComponent} options={{headerShown: false}}/>
           <HomeStack.Screen name="ItemDetail" component={ItemDetailScreen} />
           <HomeStack.Screen name="OrderDetail" component={OrderDetailScreen} />
-          <HomeStack.Screen name="SearchResults" component={SearchResultsScreen} />
+          <HomeStack.Screen name="SearchResults" component={SearchResultsScreen} options={{title: "Search Results"}}/>
         </HomeStack.Navigator>
       );
     }

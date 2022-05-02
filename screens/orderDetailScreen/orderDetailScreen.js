@@ -1,11 +1,13 @@
-import react, {useEffect, useState} from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image } from 'react-native';
+import react, {useEffect, useState, useContext} from 'react';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image, FlatList } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import NumericInput from 'react-native-numeric-input'
 import { useGetItemsQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetOrdersQuery} from '../../generated/graphql'
+
+import { UserContext } from '../../context/userContext'
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     boldMainText: {
         fontSize:20,
         fontWeight:"600",
-        marginBottom:15,
+
 
     },
     boldSecondaryText: {
@@ -89,11 +91,14 @@ const styles = StyleSheet.create({
         display:"flex",
         flexDirection: "row",
         justifyContent:"space-between",
+        borderStyle: "solid",
+        borderBottomColor:"black",
+        borderBottomWidth: 1,
+        paddingBottom: 10
     },
     boldMainText: {
-        fontSize:15,
+        fontSize:20,
         fontWeight:"600",
-        marginBottom:15,
       },
       boldSecondaryText: {
         fontSize:15,
@@ -123,6 +128,7 @@ const styles = StyleSheet.create({
   });
   
 export default function OrderDetailScreen({ navigation, route }) {
+    const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
     const { upcCode, orderId } = route.params
     console.log(upcCode)
     const {loading:getCartsLoading, data:getCartsData, error: getCartsError} = useGetCartsQuery({
@@ -139,7 +145,7 @@ export default function OrderDetailScreen({ navigation, route }) {
         fetchPolicy:"network-only",
         variables: {
             getOrdersInput: {
-                userId: 1,
+                userId: user.id,
                 ids: [orderId]
             },
         },
@@ -151,9 +157,13 @@ export default function OrderDetailScreen({ navigation, route }) {
   if (getOrdersError) return <Text>{getOrdersError.message}</Text>
 
   const order = getOrdersData.orders[0]
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.safeContainer}>
+            <FlatList
+            ListHeaderComponent={
+            <View>
             <View style={styles.orderSummaryView}>
             <View>
            <Text style={[styles.bodyText, {textAlign: "left", marginBottom: 5}]}>
@@ -168,22 +178,18 @@ export default function OrderDetailScreen({ navigation, route }) {
               ${order.subtotal}
             </Text>  
             <Text style={[styles.mutedBodyTextSmall, {textAlign: "right"}]}>
-               {order.orderItems.length} Items
+               {order.orderItems.length} Items 
             </Text> 
             </View>
             </View>
-            <View
-  style={{
-    borderBottomColor: 'black',
-    borderBottomWidth: 0.5,
-    marginTop: 10
-  }}
-/>
-            <View>
-                {
-                    order.orderItems.map((item) => {
-                       return (
-                 
+    
+            </View>
+            }
+            data={order.orderItems}
+            numColumns={1}
+            
+            renderItem={ ({item}) => {
+            return (
             <View key={item.id} style={styles.orderItemContainer}>
             <Text style={styles.boldSecondaryText}>{item.description}</Text>
             <View style={styles.itemContainer}> 
@@ -205,18 +211,19 @@ export default function OrderDetailScreen({ navigation, route }) {
             </View>
 
             <View style={styles.itemPriceContainer}>
-                <Text style={{textAlign:"right"}}>${item.case_cost * item.quantity}</Text>
+                <Text style={{textAlign:"right"}}>${parseFloat((item.case_cost * item.quantity).toFixed(2))}</Text>
             </View>
             </View>
             </View>
             
             
-           
-    
-                       )
-                    })
-                }
-            </View>
+            )}}
+            keyExtractor={item => item.id}
+            >
+
+                
+            </FlatList>
+
             </View>
         </SafeAreaView>
     )

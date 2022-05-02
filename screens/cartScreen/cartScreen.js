@@ -1,4 +1,4 @@
-import react, {useEffect, useState} from 'react';
+import react, {useEffect, useState, useContext} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,6 +9,9 @@ import OrderSubmittedScreen from '../orderSubmittedScreen/orderSubmittedScreen.j
 import NumericInput from 'react-native-numeric-input'
 import { useGetCartsQuery, useUpdateItemInCartMutation } from '../../generated/graphql'
 import { Ionicons } from '@expo/vector-icons';
+
+
+import { UserContext } from '../../context/userContext'
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -159,11 +162,12 @@ scrollView: {
   
 
 function CartScreenComponent({ navigation }) {
+    const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
     const {loading, data, error} = useGetCartsQuery({
         fetchPolicy:"network-only",
         variables: {
             getCartsInput: {
-                ids: ["1"]
+                userId: user.id
             },
         },
         pollInterval: 500
@@ -226,6 +230,7 @@ function CartScreenComponent({ navigation }) {
                 </View>
                 <View style={styles.itemsContainer}>
                     <Text style={styles.secondaryTitleText}>Items</Text>
+                    {cart.cartItems.length == 0 && <Text style={[styles.secondaryTitleText, {marginTop:"30%", textAlign:"center"}]}>No Items In Cart</Text>}
                     {
                         cart.cartItems.map((cartItem) => { return (
                         <View key={cartItem.id} style={styles.itemContainer}>

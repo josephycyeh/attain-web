@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
 });
 
 const InfiniteHits = ({ hits, hasMore, refineNext, goToItemDetail}) => {
-  console.log(hits)
   return (
     <View>
     

@@ -11,26 +11,41 @@ import LoginScreen from './screens/login/loginScreen.js'
 import OrderSubmittedScreen from './screens/orderSubmittedScreen/orderSubmittedScreen.js'
 import ItemDetailScreen from './screens/itemDetailScreen/itemDetailScreen'
 import { AppRegistry } from 'react-native';
-import { ApolloClient,} from 'apollo-client';
-import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloClient, InMemoryCache} from '@apollo/client';
+
 import { ApolloProvider } from '@apollo/react-hooks';
 import { HttpLink } from 'apollo-link-http';
 import Constants from "expo-constants";
-import * as SecureStore from 'expo-secure-store';
 import { UserContext } from './context/userContext'
-import axios from 'axios'
-async function save(key, value) {
-  await SecureStore.setItemAsync(key, value);
-}
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firestore";
 
-async function deleteKey(key) {
-  await SecureStore.deleteItemAsync(key);
-}
+import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetUsersQuery } from './generated/graphql'
 
-async function getValueFor(key) {
-  let result = await SecureStore.getItemAsync(key);
-  return result
-}
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDazkUMxMUnWRpp19dAH31_TXJ3xrQL3RE",
+  authDomain: "attain-23279.firebaseapp.com",
+  projectId: "attain-23279",
+  storageBucket: "attain-23279.appspot.com",
+  messagingSenderId: "556882473265",
+  appId: "1:556882473265:web:a92cd9a5294dc755f38010",
+  measurementId: "G-H6QGK63XJL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
 
 
 
@@ -56,61 +71,85 @@ const client = new ApolloClient({
 
 
 
-
-
-
 export default function App() {
+  return (
+    <ApolloProvider client={client}>
+      <AppComponent></AppComponent>
+    </ApolloProvider>
+  )
+}
+
+function AppComponent() {
   
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [loading, setLoading] = useState(true)
 
+
+
+
+
+
+
+  const [isLoggedIn, setIsLoggedIn] = useState(null)
+
+  const [user, setUser] = useState({})
+  const [userId, setUserId] = useState(null)
+  
+  const {loading:getUsersLoading, data:getUsersData, error:getUsersError} = useGetUsersQuery({
+    skip: (userId == null),
+    variables: {
+        getUsersInput: {
+          ids: [userId]
+        },
+    },
+    pollInterval: 500
+})
 
   useEffect(async () => {
-    console.log("load")
-    const access_token = await getValueFor('access_token')
-    if (access_token) {
-      const userProfile = await getUserProfile(access_token)
-      if (userProfile) {
-        setIsLoggedIn(true)
-      }
-      else {
-        setIsLoggedIn(false)
-      }
-      
-    } else {
-      console.log("aaa")
-      setIsLoggedIn(false)
-    }
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
 
-    setLoading(false)
+        const querySnapshot = await getDoc(doc(db, "users", user.uid));
+       
+
+        setUserId(querySnapshot.data()["userId"])
+
+        setIsLoggedIn(true)
+
+
+      } else {
+        setIsLoggedIn(false)
+        setUserId(null)
+      }
+    });
   }, [])
 
 
+  useEffect(() => {
+    if (!getUsersLoading && getUsersData) {
+      setUser(getUsersData.users[0])
+    }
+  }, [getUsersLoading, getUsersData])
+
+
+
+
   
-  const getUserProfile = async (access_token) => {
-      try {
-          console.log(access_token)
-          const userInfo = await axios.get('https://dev-wlkiowyr.us.auth0.com/userinfo', {headers: {"Authorization": `Bearer ${access_token}`, "Content-Type": "application/json"}})
-          return userInfo.data
-      }
-      catch(err) {
-           console.log(err)
-           console.log(err.message)
-      }
-     
-     
+
+
+
+  if (isLoggedIn == null) {
+    return <Text>Loading</Text>
   }
 
-  if (loading) {
-    return null
-  }
+  if (getUsersLoading && !getUsersData) return <Text>Loading</Text>
+  if (getUsersError) return <Text>Error: {getUsersError.message}</Text>
+
+  
 
   const AppStack = createStackNavigator();
-
       return (
-        <ApolloProvider client={client}>
-          <UserContext.Provider value={{isLoggedIn, setIsLoggedIn}}>
+  
+          <UserContext.Provider value={{isLoggedIn, setIsLoggedIn, user}}>
        <NavigationContainer>
         <AppStack.Navigator>
           {
@@ -121,7 +160,10 @@ export default function App() {
           <AppStack.Screen name="OrderSubmittedScreen" component={OrderSubmittedScreen} options={{headerShown: false, presentation: "modal" }}/>
         </AppStack.Navigator>
          </NavigationContainer>
-         </UserContext.Provider>
-         </ApolloProvider>
+         </UserContext.Provider>  
+
       );
     }
+
+
+

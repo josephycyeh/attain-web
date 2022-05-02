@@ -1,4 +1,4 @@
-import react, {useEffect, useState} from 'react';
+import react, {useEffect, useState, useContext} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import NumericInput from 'react-native-numeric-input'
 import { useGetItemsQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation } from '../../generated/graphql'
+import { UserContext } from '../../context/userContext'
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -85,13 +86,13 @@ const styles = StyleSheet.create({
   });
   
 export default function ItemDetailScreen({ navigation, route }) {
+    const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
     const { upcCode } = route.params
-    console.log(upcCode)
     const {loading:getCartsLoading, data:getCartsData, error: getCartsError} = useGetCartsQuery({
         fetchPolicy:"network-only",
         variables: {
             getCartsInput: {
-                ids: ["1"]
+                userId: user.id
             },
         },
         pollInterval: 500
@@ -111,7 +112,6 @@ export default function ItemDetailScreen({ navigation, route }) {
     const [updateItemInCart, {loading:updateItemInCartLoading, data:updateItemInCartData, error:updateItemInCartError}] = useUpdateItemInCartMutation()
 
     const onEditQuantity = (value) => {
-        console.log(value)
         setQuantity(value)
     }
     const [quantity, setQuantity] = useState(1)
@@ -139,13 +139,12 @@ export default function ItemDetailScreen({ navigation, route }) {
         var quantityToBeUpdated = quantity
         const checkItemId = cartItem => cartItem.item_id == item.id
         if (cart.cartItems.some(checkItemId)) {
-            console.log("/////")
             quantityToBeUpdated += cart.cartItems.find(cartItem => cartItem.item_id == item.id).quantity
         }
         updateItemInCart({
             variables: {
                 updateItemInCartInput: {
-                cartId: 1,
+                cartId: cart.id,
                 itemId: item.id,
                 quantity: quantityToBeUpdated
                 }
