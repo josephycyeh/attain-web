@@ -194,7 +194,7 @@ function HomeComponent({ navigation }) {
   const auth = getAuth();
 
   const {loading:getOrdersLoading, data:getOrdersData, error:getOrdersError} = useGetOrdersQuery({
-    fetchPolicy:"network-only",
+    fetchPolicy: 'cache-and-network',
     variables: {
         getOrdersInput: {
             userId: user.id
@@ -204,7 +204,7 @@ function HomeComponent({ navigation }) {
 })
 
 const {loading:getCartsLoading, data:getCartsData, error: getCartsError} = useGetCartsQuery({
-  fetchPolicy:"network-only",
+  fetchPolicy: 'cache-and-network',
   variables: {
       getCartsInput: {
           userId: user.id
@@ -213,12 +213,12 @@ const {loading:getCartsLoading, data:getCartsData, error: getCartsError} = useGe
   pollInterval: 500
 })
 
-const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = useGetItemsQuery({ 
-  fetchPolicy: 'network-only',
+const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchMore: fetchMoreItemsQuery} = useGetItemsQuery({ 
+  fetchPolicy: 'cache-and-network',
   variables: { getItemsInput: {
     pagination: {
-      offset: 150,
-      limit: 100
+      offset: 0,
+      limit: 20
     }
   } }})
 
@@ -261,6 +261,20 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
     navigation.navigate("SearchResults")
   }
 
+
+  const fetchMoreItems = () => {
+    fetchMoreItemsQuery({
+      variables: {
+        getItemsInput: {
+          pagination: {
+            offset: getItemsData.items.length + 1,
+          }
+        }
+        
+         
+      }
+    });
+  }
 
   const cart = getCartsData.carts[0]
   const addItemToCart = (item) => {
@@ -388,6 +402,30 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData } = use
          
           }
         keyExtractor={item => item.id}
+        onEndReached={() => {
+          console.log(getItemsData.items.length)
+        fetchMoreItemsQuery({
+            variables: { 
+              getItemsInput: {
+                pagination: {
+                  offset: getItemsData.items.length,
+                  limit: 20
+                }
+              }
+             },
+            updateQuery: (previousResult, { fetchMoreResult }) => {
+              // Don't do anything if there weren't any new items
+              if (!fetchMoreResult || fetchMoreResult.items.length === 0) {
+                return previousResult;
+              }      
+              return {
+                // Append the new feed results to the old one
+                items: previousResult.items.concat(fetchMoreResult.items),
+              };
+            },
+          });
+        }}
+        onEndReachedThreshold={0.3} 
       />
 {/*       
           {getItemsData.items.map((item) => {

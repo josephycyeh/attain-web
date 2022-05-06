@@ -2,7 +2,7 @@
   "expo": {
     "name": "Attain Wholesale",
     "slug": "Attain",
-    "version": "3.9",
+    "version": "5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "joinattain.com",
@@ -18,7 +18,7 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "20",
+      "buildNumber": "21",
       "icon": "./applogo.png",
       "supportsTablet": false,
       "infoPlist": {
