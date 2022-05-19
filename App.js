@@ -21,7 +21,8 @@ import { UserContext } from './context/userContext'
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firestore";
-
+import { useFonts } from 'expo-font';
+import AppLoading from 'expo-app-loading';
 import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetUsersQuery } from './generated/graphql'
 
 
@@ -82,12 +83,14 @@ export default function App() {
 function AppComponent() {
   
 
+  let [fontsLoaded] = useFonts({
+    'Lato': require('./assets/fonts/Lato.ttf'),
+    'Inter': require('./assets/fonts/Inter.otf')
+  });
 
-
-
-
-
-
+  // if (!fontsLoaded) {
+  //   <AppLoading />;
+  // }
 
   const [isLoggedIn, setIsLoggedIn] = useState(null)
 
