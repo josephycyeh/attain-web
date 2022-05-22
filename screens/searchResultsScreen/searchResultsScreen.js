@@ -69,8 +69,6 @@ const styles = StyleSheet.create({
     buttonContainer: {
         marginTop:10,
         marginBottom:0,
-       
-
     },
     mainButton: {
         color:'white',
@@ -92,7 +90,7 @@ const styles = StyleSheet.create({
   
   
   const Results = connectStateResults(({ searchState, children }) => {
-      console.log(searchState.query)
+    // console.log(searchState.query)
     return (searchState && searchState.query  ? (
         children
       ) : null
@@ -117,11 +115,9 @@ export default function SearchResultsScreen({ navigation, route }) {
              <InfiniteHits goToItemDetail={goToItemDetail} />
             </Results>     
           </InstantSearch>
-            <View style={{justifyContent:"center", alignItems:"center", flexDirection:"row"}}>
+            {/* <View style={{justifyContent:"center", alignItems:"center", flexDirection:"row", marginTop:10}}>
                 <Text>Start typing to search!</Text>
-            </View>
-            
-          
+            </View> */}
             </View>
         </SafeAreaView>
     )

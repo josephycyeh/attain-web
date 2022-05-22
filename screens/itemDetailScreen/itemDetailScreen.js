@@ -81,6 +81,14 @@ const styles = StyleSheet.create({
     mainButtonText: {
         fontSize:20,
         color:"white"
+    },
+    errorText: {
+        textAlign: 'center',
+        fontSize: 20,
+        alignItems:'center',
+        justifyContent:"center",
+        marginTop:40,
+        flexDirection:"row"
     }
   });
   
@@ -115,17 +123,17 @@ export default function ItemDetailScreen({ navigation, route }) {
         setQuantity(value)
     }
     const [quantity, setQuantity] = useState(1)
-    if (loading && !data) return <Text>loading...</Text>
-    if (error) return <Text>something wrong</Text>
-    if (getCartsLoading && !getCartsData) return <Text>loading...</Text>
-    if (getCartsError) return <Text>something wrong</Text>
+    if (loading && !data) return <Text style={styles.errorText}>Loading item...</Text>
+    if (error) return <Text style={styles.errorText}>Something went wrong!</Text>
+    if (getCartsLoading && !getCartsData) return <Text style={styles.errorText}>Loading item...</Text>
+    if (getCartsError) return <Text style={styles.errorText}>Something went wrong!</Text>
     
     const cart = getCartsData.carts[0]
     if (data.items.length === 0) {
         return (
             <SafeAreaView style={styles.container}>
                 <View style={styles.safeContainer}>
-                    <Text>Sorry we don't have that item yet</Text>
+                    <Text style={styles.errorText}>Sorry! We don't have that item yet.</Text>
                 </View>
             </SafeAreaView>
         )

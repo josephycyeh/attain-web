@@ -1,5 +1,5 @@
 import react, {useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, FlatList, StatusBar, TextInput,TouchableOpacity, Image, Alert, Platform } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, FlatList, StatusBar, TextInput,TouchableOpacity, Image, Alert, Platform, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -16,11 +16,14 @@ import SearchResultsScreen from '../searchResultsScreen/searchResultsScreen'
 import { Ionicons } from '@expo/vector-icons';
 
 
+
+
 import axios from "axios"
 
 
 import { UserContext } from '../../context/userContext'
 import { getAuth, signOut } from "firebase/auth";
+import ScannerScreen from '../scannerScreen/scannerScreen';
 
 const searchClient = algoliasearch(
   'latency',
@@ -92,13 +95,13 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight:20
   },
-  boldText: {
-    fontSize: 25,
+  h1FontSemiBold: {
+    fontSize: 24,
     fontWeight: "600"
   },
-  boldSecondaryText: {
+  h3FontRegular: {
     fontSize: 20,
-    fontWeight: "600"
+    fontWeight: "400"
   },
   bodyText: {
     fontSize: 15
@@ -162,7 +165,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems:"center",
-    padding: 20
+    padding: 20,
   },
   searchBar: {
     width: "100%",
@@ -170,21 +173,30 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "flex-start",
-    padding: 10
+    padding: 10,
+    borderRadius: 8
     
   },
   searchBarInsideView: {
 
     flexDirection: "row",
     justifyContent: "center",
-    alignItems:"center"
+    alignItems:"center",
   },
 
   mutedBodyText: {
-    fontSize: 15,
-    color: "#313233",
+    marginLeft: 4,
+    fontSize: 14,
+    color: "#6F6C6C",
+    fontWeight: '500',
+    lineHeight: 16,
+    letterSpacing: -0.24
 
+  },
 
+  scanIcon: {
+    aspectRatio: 0.9,
+    left:236
   }
 });
 
@@ -247,20 +259,13 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
     })
   }
 
-
-
   const logoutButtonPressed = async () => {
     await signOut(auth)
   }
 
-
-
-
-
   const searchBarPressed = () => {
     navigation.navigate("SearchResults")
   }
-
 
   const fetchMoreItems = () => {
     fetchMoreItemsQuery({
@@ -304,8 +309,8 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
           <>
            <View style={styles.topBarView}>
       <View style={styles.titleView}>
-        <Text style={styles.boldSecondaryText}>Attain</Text>
-        <Text style={styles.boldText}>{user.name}</Text>
+        <Text style={styles.h1FontSemiBold}>Attain</Text>
+        <Text style={styles.h3FontRegular}>{user.name}</Text>
         <TouchableOpacity style={{position:"absolute", top: 30, right: 30}} onPress={logoutButtonPressed}>
           <Text>Logout</Text>
         </TouchableOpacity>
@@ -313,12 +318,14 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
       <View style={styles.searchBarContainer}>
       <TouchableOpacity style={styles.searchBar} onPress={searchBarPressed}>
       <View style={styles.searchBarInsideView}>
-      <Ionicons name="search" size={24} color="black"/>
-      <Text style={[styles.mutedBodyText, {marginTop:3}]}>
-        Search
-      </Text>
+        <Ionicons name="search" size={21} color="black"/>
+        <Text style={[styles.mutedBodyText, {marginTop:3}]}>
+          Search
+        </Text>
       </View>
       </TouchableOpacity>
+
+      
       </View>
       
       {/* <InstantSearch searchClient={searchClient} indexName="instant_search">
