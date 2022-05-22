@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useGetCartsQuery, useSubmitOrderMutation } from '../../generated/graphql'
 import { UserContext } from '../../context/userContext'
+import { format, add } from 'date-fns'
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
     safeContainer: {
         marginHorizontal: 20,
         backgroundColor:"white",
-        marginTop:20,
+        marginTop:0,
     },
     tinyLogo: {
       width: 50,
@@ -37,14 +38,22 @@ const styles = StyleSheet.create({
     boldSecondaryText: {
         fontSize:15,
         fontWeight:"600",    
-        marginBottom:10,
+        marginBottom:0,
     },
     itemDetailLine: {
-        backgroundColor:"white",
+
         flexDirection:'row', 
         flexWrap:'wrap',
         justifyContent:"space-between",
-        marginBottom:10
+        marginBottom:0,
+
+   
+    },
+    itemDetailContainer: {
+        flexDirection:"column",
+        justifyContent:"center",
+
+        height: 55
     },
     itemTextContainer: {
         marginLeft:20,
@@ -80,7 +89,7 @@ const styles = StyleSheet.create({
         color:"white"
     },
     titleContainer: {
-        marginBottom:10
+        marginBottom:0
     },
     titleText: {
         fontSize:45,
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap:"wrap",
         justifyContent: "space-between",
-        marginBottom:10,
+        marginBottom:0,
         marginTop:20
         
 
@@ -101,10 +110,9 @@ const styles = StyleSheet.create({
         color:"#3C95FF"
     },
     checkoutButton: {
-        backgroundColor:"#3C95FF",
+        backgroundColor:"white",
         width:150,
         height:50,
-        flex:1,
         justifyContent:"center",
         alignItems:"center",
         borderRadius:20
@@ -112,9 +120,9 @@ const styles = StyleSheet.create({
 
     },
     checkoutButtonText: {
-        fontSize:15,
+        fontSize:17,
+        color:"#3C95FF",
         fontWeight:"600",
-        color:"white",
         textAlign:"center"
         
 
@@ -123,11 +131,12 @@ const styles = StyleSheet.create({
         fontSize:20,
         fontWeight:"600",
         color:"black",
-        marginBottom:10
     },
     itemsContainer: {
-        marginTop:50,
         marginBottom:10,
+        marginTop:20,
+        // flexDirection: "column",
+        // justifyContent:"space-between"
 
     },
     itemContainer: {
@@ -144,7 +153,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 20,
         borderColor:"black",
-        padding: 10
+        padding: 10,
+        marginTop: 20,
     }
     
     
@@ -193,33 +203,56 @@ export default function CheckoutScreen({ navigation, route}) {
     const cart = getCartsData.carts[0]
     return (
         <SafeAreaView style={styles.container}>
+                        <View style={{zIndex: 5, display: "flex", justifyContent:"space-between", paddingHorizontal: 35 , flexDirection: "row", position:'absolute', bottom: 0, width: "100%", height: 65, backgroundColor:'#3C95FF', borderTopLeftRadius: 10, borderTopRightRadius: 10}}>
+               
+               <View style={{display:'flex', justifyContent:"center", flexDirection: "column"}}>
+                   <Text style={styles.boldMainText}>Subtotal</Text>
+                   <Text style={styles.boldMainText}>${cart.subtotal}</Text>
+               </View>
+               <View style={{display:'flex', justifyContent:"center", flexDirection: "column"}}>
+                  {cart.cartItems.length > 0 && <TouchableOpacity style={styles.checkoutButton} onPress={submitOrderClicked} >
+                     <Text style={styles.checkoutButtonText}>Checkout</Text>
+                  </TouchableOpacity>}
+               </View>
+          
+        </View>
             <View style={styles.safeContainer}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>Checkout</Text>
-                </View>
-                <View style={styles.summaryContainer}>
-            
-                       <TouchableOpacity style={styles.checkoutButton} onPress={submitOrderClicked}>
-                          <Text style={styles.checkoutButtonText}>Submit Order</Text>
-                       </TouchableOpacity>
-            
-                   
-                </View>
+
                 <View style={styles.itemsContainer}>
                     <Text style={styles.secondaryTitleText}>Order Summary</Text>
                     <View style={styles.orderSummaryDetail}>
+                    
+                    <View style={styles.itemDetailContainer}>
+                    <View style={styles.itemDetailLine}>
+                        <Text style={styles.boldSecondaryText}>Order Date</Text>
+                        <Text style={styles.boldSecondaryText}>{format(new Date(), 'MM/dd/yyyy')}</Text>
+                    </View>
+                    </View>
+                    <View style={styles.itemDetailContainer}>
                     <View style={styles.itemDetailLine}>
                         <Text style={styles.boldSecondaryText}>Est Delivery</Text>
-                        <Text style={styles.boldSecondaryText}>03/25/2022</Text>
+                        <Text style={styles.boldSecondaryText}>{format(add(new Date(), {days: 3}), 'MM/dd/yyyy')}</Text>
                     </View>
+                    </View>
+                    <View style={styles.itemDetailContainer}>
                     <View style={styles.itemDetailLine}>
                         <Text style={styles.boldSecondaryText}>Subtotal</Text>
                         <Text style={styles.boldSecondaryText}>${cart.subtotal}</Text>
                     </View>
+                    </View>
+                    <View style={styles.itemDetailContainer}>
+                    <View style={styles.itemDetailLine}>
+                        <Text style={styles.boldSecondaryText}>No. of items</Text>
+                        <Text style={styles.boldSecondaryText}>{cart.cartItems.length}</Text>
+                    </View>
+                    </View>
+                    <View style={styles.itemDetailContainer}>
                     <View style={styles.itemDetailLine}>
                         <Text style={styles.boldSecondaryText}>Store</Text>
                         <Text style={styles.boldSecondaryText}>Pete's Gas</Text>
                     </View>
+                    </View>
+                   
                 </View>
                 </View>
                 

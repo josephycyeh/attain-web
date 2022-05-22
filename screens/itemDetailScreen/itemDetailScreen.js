@@ -1,5 +1,5 @@
 import react, {useEffect, useState, useContext} from 'react';
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,TouchableOpacity, Image, Modal } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
     },
     boldSecondaryText: {
         fontSize:15,
-        marginBottom:10,
         fontWeight:"600",    
     },
     itemDetailLine: {
@@ -86,6 +85,7 @@ const styles = StyleSheet.create({
   });
   
 export default function ItemDetailScreen({ navigation, route }) {
+    const [showAddedToCartPopup, setShowAddedToCartPopup] = useState(false);
     const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
     const { upcCode } = route.params
     const {loading:getCartsLoading, data:getCartsData, error: getCartsError} = useGetCartsQuery({
@@ -150,11 +150,32 @@ export default function ItemDetailScreen({ navigation, route }) {
                 }
             }
         })
-        navigation.goBack()
+        setShowAddedToCartPopup(true)
+        setTimeout(() => setShowAddedToCartPopup(false), 2500)
+        // navigation.goBack()
     }
+
+    const viewCartButtonPressed = () => {
+        navigation.navigate("Cart")
+    }
+
     return (
         <SafeAreaView style={styles.container}>
+             <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
+
+        {showAddedToCartPopup && <View style={{display: "flex", justifyContent:"space-between", paddingHorizontal: 35 , flexDirection: "row", position:'absolute', bottom: 0, width: "100%", height: 60, backgroundColor:'#3C95FF', borderTopLeftRadius: 10, borderTopRightRadius: 10}}>
+            <View style={{display:'flex', justifyContent:"center", flexDirection: "column"}}>
+                <Text style={styles.boldSecondaryText}>Item Added</Text>
+            </View>
+            <View style={{display:'flex', justifyContent:"center", flexDirection: "column"}}>
+                <TouchableOpacity onPress={viewCartButtonPressed}>
+                    <Text style={[styles.boldSecondaryText, {textDecorationLine: "underline"}]}>View Cart</Text>
+                 </TouchableOpacity>
+            </View>
+        </View>}
             <View style={styles.safeContainer}>
+
+
             <View style={styles.itemContainer}>
             <Image style={styles.itemImage} source={{uri:item.image}}/>
             <View style={styles.itemTextContainer}>

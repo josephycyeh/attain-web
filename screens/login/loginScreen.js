@@ -157,7 +157,7 @@ export default function LoginScreen({ navigation, route }) {
 
     }
     const auth = getAuth();
-
+    const [loginError, setLoginError] = useState(null)
     const signInButtonPressed = async () => {
         const email = credentials.username + "@joinattain.com"
         console.log(email)
@@ -170,17 +170,35 @@ export default function LoginScreen({ navigation, route }) {
         })
         .catch((error) => {
             const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(error.message)
+            var errorMessage = error.message;
+            if (errorCode == "auth/too-many-requests") {
+                errorMessage = "Too Many Requests, Wait A Minute To Try Again"
+            }
+            if (errorCode == "auth/wrong-password") {
+                errorMessage = "Wrong Password"
+            }
+
+            if (errorCode == "auth/user-not-found") {
+                errorMessage = "Wrong Username"
+            }
+
+            setLoginError(errorMessage)
+            setTimeout(() => setLoginError(null), 3000)
         });
     }
 
+    
 
 
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.safeContainer}>
+            {loginError && <View style={{display: "flex", justifyContent:"center", paddingHorizontal: 35 , alignItems:"center", flexDirection: "row", position:'absolute', top: 10, width: "100%", height: 60, backgroundColor:'#3C95FF', borderRadius: 0, borderRadius: 0}}>
+              <View style={{display:'flex', justifyContent:"center", flexDirection: "column"}}>
+                <Text style={styles.boldSecondaryText}>{loginError}</Text>
+            </View>
+        </View>}
             <View style={styles.credentialsContainer}>
 
            
@@ -192,8 +210,8 @@ export default function LoginScreen({ navigation, route }) {
                 <Text style={[styles.boldMainText, {marginBottom: 50}]}>Your one-stop shop for inventory</Text>
 
               
-                <TextInput style={[styles.credentialsInput, {marginBottom: 10}]} placeholder="username" onChangeText={(text) => onChangeText("username", text)} autoCapitalize='none' value={credentials.username} ></TextInput>
-                <TextInput style={[styles.credentialsInput, {marginBottom: 10}]} placeholder="password" onChangeText={(text) => onChangeText("password", text)}  autoCapitalize='none' value={credentials.password} secureTextEntry={true} autoCorrect={false}></TextInput>
+                <TextInput style={[styles.credentialsInput, {marginBottom: 10}]} placeholderTextColor="gray" placeholder="username" onChangeText={(text) => onChangeText("username", text)} autoCapitalize='none' value={credentials.username} autoCorrect={false}></TextInput>
+                <TextInput style={[styles.credentialsInput, {marginBottom: 10}]} placeholderTextColor="gray" placeholder="password" onChangeText={(text) => onChangeText("password", text)}  autoCapitalize='none' value={credentials.password} autoCorrect={false}></TextInput>
     
                 <TouchableOpacity style={[styles.signInButton, {marginTop: 50}]} onPress={signInButtonPressed}>
                 <Text style={[styles.boldSecondaryText, {color:"white"}]}>Sign In</Text>

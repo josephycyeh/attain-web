@@ -448,8 +448,8 @@ export default function HomeScreen() {
       return (
         <HomeStack.Navigator>
           <HomeStack.Screen name="Attain" component={HomeComponent} options={{headerShown: false}}/>
-          <HomeStack.Screen name="ItemDetail" component={ItemDetailScreen} />
-          <HomeStack.Screen name="OrderDetail" component={OrderDetailScreen} />
+          <HomeStack.Screen name="ItemDetail" component={ItemDetailScreen} options={{title: "Item Details"}}/>
+          <HomeStack.Screen name="OrderDetail" component={OrderDetailScreen} options={{title: "Order Details"}} />
           <HomeStack.Screen name="SearchResults" component={SearchResultsScreen} options={{title: "Search Results"}}/>
         </HomeStack.Navigator>
       );

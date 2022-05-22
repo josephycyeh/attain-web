@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
         backgroundColor:"white",
     },
 scrollView: {
-  marginHorizontal: 20,
+  paddingHorizontal: 20,
   backgroundColor:"white"
   
 },
@@ -117,19 +117,20 @@ scrollView: {
         color:"#3C95FF"
     },
     checkoutButton: {
-        backgroundColor:"#3C95FF",
+        backgroundColor:"white",
         width:150,
-        flex:1,
+        height: "80%",
         justifyContent:"center",
         alignItems:"center",
-        borderRadius:20
+        borderRadius:15,
+
         
 
     },
     checkoutButtonText: {
-        fontSize:15,
+        fontSize:17,
         fontWeight:"600",
-        color:"white",
+        color:"#3C95FF",
         textAlign:"center"
         
 
@@ -141,7 +142,7 @@ scrollView: {
         marginBottom:10
     },
     itemsContainer: {
-        marginTop:50,
+        marginTop:20,
         marginBottom:10,
 
     },
@@ -212,25 +213,29 @@ function CartScreenComponent({ navigation }) {
     }
     return (
         <SafeAreaView style={styles.container}>
-             <ScrollView style={styles.scrollView}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>Order Cart</Text>
-                </View>
-                <View style={styles.summaryContainer}>
-                    <View>
-                        <Text style={styles.boldMainTextColor}>Subtotal</Text>
+            <View style={{zIndex: 5, display: "flex", justifyContent:"space-between", paddingHorizontal: 35 , flexDirection: "row", position:'absolute', bottom: 0, width: "100%", height: 65, backgroundColor:'#3C95FF', borderTopLeftRadius: 10, borderTopRightRadius: 10}}>
+               
+                    <View style={{display:'flex', justifyContent:"center", flexDirection: "column"}}>
+                        <Text style={styles.boldMainText}>Subtotal</Text>
                         <Text style={styles.boldMainText}>${cart.subtotal}</Text>
                     </View>
-                    <View>
-                       <TouchableOpacity style={styles.checkoutButton} onPress={goToCheckout}>
-                          <Text style={styles.checkoutButtonText}>Continue To Checkout</Text>
-                       </TouchableOpacity>
+                    <View style={{display:'flex', justifyContent:"center", flexDirection: "column"}}>
+                       {cart.cartItems.length > 0 && <TouchableOpacity style={styles.checkoutButton} onPress={goToCheckout} >
+                          <Text style={styles.checkoutButtonText}>Continue</Text>
+                       </TouchableOpacity>}
                     </View>
-                   
-                </View>
+               
+             </View>
+
+
+             <ScrollView style={styles.scrollView}>
                 <View style={styles.itemsContainer}>
                     <Text style={styles.secondaryTitleText}>Items</Text>
-                    {cart.cartItems.length == 0 && <Text style={[styles.secondaryTitleText, {marginTop:"30%", textAlign:"center"}]}>No Items In Cart</Text>}
+                    {cart.cartItems.length == 0 && 
+                    <View style={{marginTop: "50%"}}>
+                    <Text style={[styles.secondaryTitleText, {textAlign:"center"}]}>No Items In Cart</Text>
+                    <Text style={[styles.thirdTitleText, {marginTop:"5%", textAlign:"center"}]}>Add Items To Cart To Checkout</Text> 
+                    </View>}
                     {
                         cart.cartItems.map((cartItem) => { return (
                         <View key={cartItem.id} style={styles.itemContainer}>
@@ -260,8 +265,8 @@ const CartStack = createStackNavigator();
 export default function CartScreen() {
       return (
         <CartStack.Navigator>
-          <CartStack.Screen name="CartScreen" component={CartScreenComponent} options={{headerShown: false}} />
-          <CartStack.Screen name="CheckoutScreen" component={CheckoutScreen} />
+          <CartStack.Screen name="CartScreen" component={CartScreenComponent} options={{title: "Cart", headerShown: true}} />
+          <CartStack.Screen name="CheckoutScreen" component={CheckoutScreen}  options={{title: "Checkout", headerShown: true}} />
         </CartStack.Navigator>
       );
     }
