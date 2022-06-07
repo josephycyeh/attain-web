@@ -6,13 +6,9 @@ query GetOrders($getOrdersInput: GetOrdersInput) {
     date_submitted
     orderItems {
       id
-      sku
-      description
-      sell_size
+      name
       unit_size
-      case_cost
-      profit_margin
-      srp
+      price
       upc1
       upc2
       nacs_category

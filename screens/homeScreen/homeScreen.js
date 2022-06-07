@@ -7,10 +7,11 @@ import algoliasearch from 'algoliasearch';
 import { InstantSearch, connectStateResults } from 'react-instantsearch-native';
 import SearchBox from '../../components/SearchBox';
 import InfiniteHits from '../../components/InfiniteHits';
-import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation } from '../../generated/graphql'
+import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetCategoriesQuery } from '../../generated/graphql'
 import ItemDetailScreen from '../itemDetailScreen/itemDetailScreen'
 import OrderDetailScreen from '../orderDetailScreen/orderDetailScreen'
 
+import SelectItemsScreen from '../selectItemsScreen/selectItemsScreen'
 import SearchResultsScreen from '../searchResultsScreen/searchResultsScreen'
 
 import { Ionicons } from '@expo/vector-icons';
@@ -185,6 +186,25 @@ const styles = StyleSheet.create({
     color: "#313233",
 
 
+  },
+
+  categoryView: {
+    borderStyle:"solid",
+    borderColor:"gray",
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 15,
+    marginRight: 15,
+    width: 110,
+    display:"flex",
+    flexDirection: "row",
+    justifyContent:"center",
+  },
+  categoryImage: {
+    width: "65%",
+    aspectRatio: 1,
+    marginBottom: 5
   }
 });
 
@@ -222,6 +242,16 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
     }
   } }})
 
+  const { loading:getCategoriesLoading, error:getCategoriesError, data: getCategoriesData} = useGetCategoriesQuery({ 
+    fetchPolicy: 'cache-and-network',
+    variables: { getCategoriesInput: {
+      pagination: {
+        offset: 0,
+        limit: 20
+      }
+    } }})
+
+  
 
   const [updateItemInCart, {loading:updateItemInCartLoading, data:updateItemInCartData, error:updateItemInCartError}] = useUpdateItemInCartMutation()
 
@@ -235,6 +265,9 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
 
   if (getItemsLoading && !getItemsData) return <Text>Loading</Text>
   if (getItemsError) return <Text>{getItemsError.message}</Text>
+
+  if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>
+  if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>
   const itemClicked = (item) => {
     navigation.navigate("ItemDetail", {
       upcCode: item.upc1
@@ -294,6 +327,13 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
     })
 }
 
+const categorySelected = (category) => {
+  navigation.navigate("SelectItems", {
+    category: category,
+    title: category.name
+  })
+}
+
   return (
    <View style={styles.homeContainer}>
     <SafeAreaView style={styles.container}>
@@ -329,6 +369,33 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
           </InstantSearch> */}
     </View>
    
+    <View style={styles.orderSectionView}>
+    <Text style={[styles.titleText, {marginBottom: 15}]}>
+            Categories
+          </Text>
+
+        
+        
+    <ScrollView style={styles.scrollView} horizontal={true}> 
+      {getCategoriesData.categories.map((category) => {
+        return (
+          
+          <TouchableOpacity style={styles.categoryView} key={category.name} onPress={() => categorySelected(category)}> 
+          <View style={{
+    flexDirection: "column", alignItems:"center", flex:1}}>
+            <Image style={styles.categoryImage} source={{uri: category.image}}>
+
+            </Image>
+           <Text style={[styles.bodyText, {textAlign:"center"}]}>
+              {category.name}
+            </Text>  
+          
+            </View>
+          </TouchableOpacity>
+        )
+      })}
+    </ScrollView>
+    </View>
     <View style={styles.orderSectionView}>
     <Text style={[styles.titleText, {marginBottom: 5}]}>
             Recent Orders
@@ -389,10 +456,10 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
             <TouchableOpacity style={styles.itemView} onPress={() => { itemClicked(item) }}>
                <Image style={styles.itemImage} source={{uri: item.image ? item.image : "https://via.placeholder.com/150"}}/>
               <View style={{width:"100%"}}>
-             <Text numberOfLines={1} style={styles.boldBodyTextSmall}>{item.description}</Text>
+             <Text numberOfLines={1} style={styles.boldBodyTextSmall}>{item.name}</Text>
              <Text style={styles.mutedBodyTextExtraSmall}>Unit Size: {item.unit_size}</Text>
              <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-             <Text style={[styles.boldBodyText, {marginTop: 5}]}>${item.case_cost}</Text>
+             <Text style={[styles.boldBodyText, {marginTop: 5}]}>${item.price}</Text>
              <TouchableOpacity style={styles.addToCartButton} onPress={() => addItemToCart(item)}>
               <Ionicons style={{textAlign:"center"}} name="add" size={24} color="black" />
              </TouchableOpacity>
@@ -450,6 +517,7 @@ export default function HomeScreen() {
           <HomeStack.Screen name="Attain" component={HomeComponent} options={{headerShown: false}}/>
           <HomeStack.Screen name="ItemDetail" component={ItemDetailScreen} options={{title: "Item Details"}}/>
           <HomeStack.Screen name="OrderDetail" component={OrderDetailScreen} options={{title: "Order Details"}} />
+          <HomeStack.Screen name="SelectItems" component={SelectItemsScreen} options={({ route }) => ({title: route.params.title})}/>
           <HomeStack.Screen name="SearchResults" component={SearchResultsScreen} options={{title: "Search Results"}}/>
         </HomeStack.Navigator>
       );

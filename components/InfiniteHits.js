@@ -32,7 +32,7 @@ const InfiniteHits = ({ hits, hasMore, refineNext, goToItemDetail}) => {
               
             <View style={styles.item} key={item.objectID} >
               <Text style={styles.titleText}>
-                <Highlight attribute="description" hit={item} />
+                <Highlight attribute="name" hit={item} />
               </Text>
             </View>
             </TouchableOpacity>

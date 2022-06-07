@@ -241,10 +241,10 @@ function CartScreenComponent({ navigation }) {
                         <View key={cartItem.id} style={styles.itemContainer}>
                         <View>
                           
-                            <Text style={styles.boldSecondaryText}>{cartItem.description}</Text> 
-                            <Text style={styles.boldSecondaryText}>Sku#: {cartItem.sku}</Text>
+                            <Text style={styles.boldSecondaryText}>{cartItem.name}</Text> 
+                            <Text style={styles.boldSecondaryText}>Sku#: {cartItem.id}</Text>
                             <Text style={styles.boldSecondaryText}>Unit Size: {cartItem.unit_size}</Text>
-                            <Text style={styles.boldSecondaryText}>Case Costs: {cartItem.case_cost}</Text>
+                            <Text style={styles.boldSecondaryText}>Price: {cartItem.price}</Text>
                         </View>
                         <View style={{flexDirection:"column", justifyContent:"space-between", paddingVertical: 15}}>
                             <NumericInput initValue={cartItem.quantity} value={cartItem.quantity} totalHeight={30} totalWidth={80} rounded iconSize={100} leftButtonBackgroundColor={'#88BEFF'} rightButtonBackgroundColor={"#88BEFF"} onChange={value => onEditQuantity(cart.id, cartItem.item_id, value)} />

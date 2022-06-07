@@ -30,21 +30,28 @@ export type Cart = {
 
 export type CartItem = {
   __typename?: 'CartItem';
-  case_cost: Scalars['Float'];
-  description: Scalars['String'];
   id: Scalars['ID'];
   image?: Maybe<Scalars['String']>;
   item_id: Scalars['Int'];
   nacs_category?: Maybe<Scalars['String']>;
   nacs_subcategory?: Maybe<Scalars['String']>;
-  profit_margin: Scalars['Float'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
   quantity: Scalars['Int'];
-  sell_size: Scalars['String'];
-  sku: Scalars['ID'];
-  srp: Scalars['Float'];
   unit_size: Scalars['Int'];
   upc1?: Maybe<Scalars['ID']>;
   upc2?: Maybe<Scalars['ID']>;
+};
+
+export type Category = {
+  __typename?: 'Category';
+  image?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+export type CategoryInput = {
+  value?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateCartInput = {
@@ -60,6 +67,15 @@ export type CreateTable = {
 export type GetCartsInput = {
   ids?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
   userId: Scalars['ID'];
+};
+
+export type GetCategoriesInput = {
+  pagination?: InputMaybe<PaginationInput>;
+};
+
+export type GetItemsByCategoryInput = {
+  category?: InputMaybe<CategoryInput>;
+  pagination?: InputMaybe<PaginationInput>;
 };
 
 export type GetItemsInput = {
@@ -78,17 +94,13 @@ export type GetUsersInput = {
 
 export type Item = {
   __typename?: 'Item';
-  case_cost: Scalars['Float'];
-  description: Scalars['String'];
   id: Scalars['ID'];
   image?: Maybe<Scalars['String']>;
   nacs_category?: Maybe<Scalars['String']>;
   nacs_subcategory?: Maybe<Scalars['String']>;
-  profit_margin: Scalars['Float'];
-  sell_size: Scalars['String'];
-  sku: Scalars['ID'];
-  srp: Scalars['Float'];
-  unit_size: Scalars['Int'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+  unit_size?: Maybe<Scalars['Int']>;
   upc1?: Maybe<Scalars['ID']>;
   upc2?: Maybe<Scalars['ID']>;
 };
@@ -132,7 +144,9 @@ export type PaginationInput = {
 export type Query = {
   __typename?: 'Query';
   carts: Array<Maybe<Cart>>;
+  categories: Array<Maybe<Category>>;
   items: Array<Maybe<Item>>;
+  itemsByCategory: Array<Maybe<Item>>;
   orders: Array<Maybe<Order>>;
   users: Array<Maybe<User>>;
 };
@@ -143,8 +157,18 @@ export type QueryCartsArgs = {
 };
 
 
+export type QueryCategoriesArgs = {
+  getCategoriesInput?: InputMaybe<GetCategoriesInput>;
+};
+
+
 export type QueryItemsArgs = {
   getItemsInput?: InputMaybe<GetItemsInput>;
+};
+
+
+export type QueryItemsByCategoryArgs = {
+  getItemsByCategoryInput?: InputMaybe<GetItemsByCategoryInput>;
 };
 
 
@@ -180,21 +204,28 @@ export type GetCartsQueryVariables = Exact<{
 }>;
 
 
-export type GetCartsQuery = { __typename?: 'Query', carts: Array<{ __typename?: 'Cart', id: string, subtotal?: number | null, cartItems?: Array<{ __typename?: 'CartItem', id: string, sku: string, description: string, sell_size: string, unit_size: number, case_cost: number, profit_margin: number, srp: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, quantity: number, item_id: number } | null> | null } | null> };
+export type GetCartsQuery = { __typename?: 'Query', carts: Array<{ __typename?: 'Cart', id: string, subtotal?: number | null, cartItems?: Array<{ __typename?: 'CartItem', id: string, name: string, unit_size: number, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, quantity: number, item_id: number } | null> | null } | null> };
 
 export type GetItemsQueryVariables = Exact<{
   getItemsInput?: InputMaybe<GetItemsInput>;
 }>;
 
 
-export type GetItemsQuery = { __typename?: 'Query', items: Array<{ __typename?: 'Item', id: string, sku: string, description: string, sell_size: string, unit_size: number, case_cost: number, profit_margin: number, srp: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, image?: string | null } | null> };
+export type GetItemsQuery = { __typename?: 'Query', items: Array<{ __typename?: 'Item', id: string, name: string, unit_size?: number | null, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, image?: string | null } | null> };
+
+export type GetItemsByCategoryQueryVariables = Exact<{
+  getItemsByCategoryInput?: InputMaybe<GetItemsByCategoryInput>;
+}>;
+
+
+export type GetItemsByCategoryQuery = { __typename?: 'Query', itemsByCategory: Array<{ __typename?: 'Item', id: string, name: string, unit_size?: number | null, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, image?: string | null } | null> };
 
 export type GetOrdersQueryVariables = Exact<{
   getOrdersInput?: InputMaybe<GetOrdersInput>;
 }>;
 
 
-export type GetOrdersQuery = { __typename?: 'Query', orders: Array<{ __typename?: 'Order', id: string, status: string, subtotal: number, date_submitted?: number | null, orderItems?: Array<{ __typename?: 'CartItem', id: string, sku: string, description: string, sell_size: string, unit_size: number, case_cost: number, profit_margin: number, srp: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, quantity: number, item_id: number, image?: string | null } | null> | null } | null> };
+export type GetOrdersQuery = { __typename?: 'Query', orders: Array<{ __typename?: 'Order', id: string, status: string, subtotal: number, date_submitted?: number | null, orderItems?: Array<{ __typename?: 'CartItem', id: string, name: string, unit_size: number, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, quantity: number, item_id: number, image?: string | null } | null> | null } | null> };
 
 export type GetUsersQueryVariables = Exact<{
   getUsersInput?: InputMaybe<GetUsersInput>;
@@ -215,7 +246,14 @@ export type UpdateItemInCartMutationVariables = Exact<{
 }>;
 
 
-export type UpdateItemInCartMutation = { __typename?: 'Mutation', updateItemInCart?: { __typename?: 'Cart', id: string, subtotal?: number | null, cartItems?: Array<{ __typename?: 'CartItem', id: string, sku: string, description: string, unit_size: number, sell_size: string, case_cost: number, profit_margin: number, srp: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, quantity: number, item_id: number } | null> | null } | null };
+export type UpdateItemInCartMutation = { __typename?: 'Mutation', updateItemInCart?: { __typename?: 'Cart', id: string, subtotal?: number | null, cartItems?: Array<{ __typename?: 'CartItem', id: string, name: string, unit_size: number, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, quantity: number, item_id: number } | null> | null } | null };
+
+export type GetCategoriesQueryVariables = Exact<{
+  getCategoriesInput?: InputMaybe<GetCategoriesInput>;
+}>;
+
+
+export type GetCategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', name?: string | null, value?: string | null, image?: string | null } | null> };
 
 
 export const GetCartsDocument = gql`
@@ -224,13 +262,9 @@ export const GetCartsDocument = gql`
     id
     cartItems {
       id
-      sku
-      description
-      sell_size
+      name
       unit_size
-      case_cost
-      profit_margin
-      srp
+      price
       upc1
       upc2
       nacs_category
@@ -274,13 +308,9 @@ export const GetItemsDocument = gql`
     query GetItems($getItemsInput: GetItemsInput) {
   items(getItemsInput: $getItemsInput) {
     id
-    sku
-    description
-    sell_size
+    name
     unit_size
-    case_cost
-    profit_margin
-    srp
+    price
     upc1
     upc2
     nacs_category
@@ -317,6 +347,49 @@ export function useGetItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetItemsQueryHookResult = ReturnType<typeof useGetItemsQuery>;
 export type GetItemsLazyQueryHookResult = ReturnType<typeof useGetItemsLazyQuery>;
 export type GetItemsQueryResult = Apollo.QueryResult<GetItemsQuery, GetItemsQueryVariables>;
+export const GetItemsByCategoryDocument = gql`
+    query GetItemsByCategory($getItemsByCategoryInput: GetItemsByCategoryInput) {
+  itemsByCategory(getItemsByCategoryInput: $getItemsByCategoryInput) {
+    id
+    name
+    unit_size
+    price
+    upc1
+    upc2
+    nacs_category
+    nacs_subcategory
+    image
+  }
+}
+    `;
+
+/**
+ * __useGetItemsByCategoryQuery__
+ *
+ * To run a query within a React component, call `useGetItemsByCategoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetItemsByCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetItemsByCategoryQuery({
+ *   variables: {
+ *      getItemsByCategoryInput: // value for 'getItemsByCategoryInput'
+ *   },
+ * });
+ */
+export function useGetItemsByCategoryQuery(baseOptions?: Apollo.QueryHookOptions<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>(GetItemsByCategoryDocument, options);
+      }
+export function useGetItemsByCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>(GetItemsByCategoryDocument, options);
+        }
+export type GetItemsByCategoryQueryHookResult = ReturnType<typeof useGetItemsByCategoryQuery>;
+export type GetItemsByCategoryLazyQueryHookResult = ReturnType<typeof useGetItemsByCategoryLazyQuery>;
+export type GetItemsByCategoryQueryResult = Apollo.QueryResult<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>;
 export const GetOrdersDocument = gql`
     query GetOrders($getOrdersInput: GetOrdersInput) {
   orders(getOrdersInput: $getOrdersInput) {
@@ -326,13 +399,9 @@ export const GetOrdersDocument = gql`
     date_submitted
     orderItems {
       id
-      sku
-      description
-      sell_size
+      name
       unit_size
-      case_cost
-      profit_margin
-      srp
+      price
       upc1
       upc2
       nacs_category
@@ -449,13 +518,9 @@ export const UpdateItemInCartDocument = gql`
     id
     cartItems {
       id
-      sku
-      description
+      name
       unit_size
-      sell_size
-      case_cost
-      profit_margin
-      srp
+      price
       upc1
       upc2
       nacs_category
@@ -493,3 +558,40 @@ export function useUpdateItemInCartMutation(baseOptions?: Apollo.MutationHookOpt
 export type UpdateItemInCartMutationHookResult = ReturnType<typeof useUpdateItemInCartMutation>;
 export type UpdateItemInCartMutationResult = Apollo.MutationResult<UpdateItemInCartMutation>;
 export type UpdateItemInCartMutationOptions = Apollo.BaseMutationOptions<UpdateItemInCartMutation, UpdateItemInCartMutationVariables>;
+export const GetCategoriesDocument = gql`
+    query GetCategories($getCategoriesInput: GetCategoriesInput) {
+  categories(getCategoriesInput: $getCategoriesInput) {
+    name
+    value
+    image
+  }
+}
+    `;
+
+/**
+ * __useGetCategoriesQuery__
+ *
+ * To run a query within a React component, call `useGetCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCategoriesQuery({
+ *   variables: {
+ *      getCategoriesInput: // value for 'getCategoriesInput'
+ *   },
+ * });
+ */
+export function useGetCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
+      }
+export function useGetCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
+        }
+export type GetCategoriesQueryHookResult = ReturnType<typeof useGetCategoriesQuery>;
+export type GetCategoriesLazyQueryHookResult = ReturnType<typeof useGetCategoriesLazyQuery>;
+export type GetCategoriesQueryResult = Apollo.QueryResult<GetCategoriesQuery, GetCategoriesQueryVariables>;

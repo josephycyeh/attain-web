@@ -3,13 +3,9 @@ mutation UpdateItemInCart($updateItemInCartInput: UpdateItemInCartInput!) {
     id
     cartItems {
       id
-      sku
-      description
+      name
       unit_size
-      sell_size
-      case_cost
-      profit_margin
-      srp
+      price
       upc1
       upc2
       nacs_category

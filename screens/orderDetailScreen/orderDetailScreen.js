@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     },
     itemInfoContainer: {
         flexDirection:'row', 
-
+        alignItems:"center",
         flexWrap:"wrap",
     },
     boldMainText: {
@@ -191,10 +191,11 @@ export default function OrderDetailScreen({ navigation, route }) {
             renderItem={ ({item}) => {
             return (
             <View key={item.id} style={styles.orderItemContainer}>
-            <Text style={styles.boldSecondaryText}>{item.description}</Text>
+            <Text style={styles.boldSecondaryText}>{item.quantity}x {item.name}</Text>
             <View style={styles.itemContainer}> 
-            <View style={styles.itemInfoContainer}>   
+            <View style={styles.itemInfoContainer}> 
             <Image style={styles.itemImage} source={{uri:item.image}}/>
+           
             <View style={styles.itemTextContainer}>
                 <Text style={styles.mutedBodyTextSmall}>UPC: {item.upc1}</Text>
     
@@ -205,13 +206,13 @@ export default function OrderDetailScreen({ navigation, route }) {
 
               
               
-                <Text style={styles.mutedBodyTextSmall}>Case Cost: {item.case_cost}</Text>
+                <Text style={styles.mutedBodyTextSmall}>Case Cost: {item.price}</Text>
             </View>
 
             </View>
 
             <View style={styles.itemPriceContainer}>
-                <Text style={{textAlign:"right"}}>${parseFloat((item.case_cost * item.quantity).toFixed(2))}</Text>
+                <Text style={{textAlign:"right"}}>${parseFloat((item.price * item.quantity).toFixed(2))}</Text>
             </View>
             </View>
             </View>
@@ -227,4 +228,4 @@ export default function OrderDetailScreen({ navigation, route }) {
             </View>
         </SafeAreaView>
     )
-}   
+}  

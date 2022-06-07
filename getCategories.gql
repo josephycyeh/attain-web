@@ -1,0 +1,7 @@
+query GetCategories($getCategoriesInput: GetCategoriesInput) {
+  categories(getCategoriesInput: $getCategoriesInput) {
+    name
+    value
+    image
+  }
+}

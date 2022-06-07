@@ -179,7 +179,7 @@ export default function ItemDetailScreen({ navigation, route }) {
             <View style={styles.itemContainer}>
             <Image style={styles.itemImage} source={{uri:item.image}}/>
             <View style={styles.itemTextContainer}>
-                <Text style={styles.boldMainText}>{item.description}</Text>
+                <Text style={styles.boldMainText}>{item.name}</Text>
                 <View style={styles.itemDetailLine}>
                 <Text style={styles.boldSecondaryText}>UPC</Text>
                 <Text style={styles.boldSecondaryText}>{item.upc1}</Text>
@@ -208,15 +208,7 @@ export default function ItemDetailScreen({ navigation, route }) {
             <View style={styles.pricingContainer}>
                  <View style={styles.itemDetailLine}>
                 <Text style={styles.boldMainText}>Price</Text>
-                <Text style={styles.boldMainText}>${item.case_cost}</Text>
-                </View>
-                <View style={styles.itemDetailLine}>
-                <Text style={styles.boldMainText}>SRP</Text>
-                <Text style={styles.boldMainText}>${item.srp}</Text>
-                </View>
-                <View style={styles.itemDetailLine}>
-                <Text style={styles.boldMainText}>Profit Margin</Text>
-                <Text style={styles.boldMainText}>{item.profit_margin}%</Text>
+                <Text style={styles.boldMainText}>${item.price}</Text>
                 </View>
             </View>
             <View style={styles.buttonContainer}>
