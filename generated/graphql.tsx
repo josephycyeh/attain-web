@@ -36,6 +36,7 @@ export type CartItem = {
   nacs_category?: Maybe<Scalars['String']>;
   nacs_subcategory?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  pitco_code?: Maybe<Scalars['String']>;
   price: Scalars['Float'];
   quantity: Scalars['Int'];
   unit_size: Scalars['Int'];
@@ -48,10 +49,6 @@ export type Category = {
   image?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
-};
-
-export type CategoryInput = {
-  value?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateCartInput = {
@@ -73,12 +70,14 @@ export type GetCategoriesInput = {
   pagination?: InputMaybe<PaginationInput>;
 };
 
-export type GetItemsByCategoryInput = {
-  category?: InputMaybe<CategoryInput>;
+export type GetItemsByFilterInput = {
+  category?: InputMaybe<Scalars['String']>;
   pagination?: InputMaybe<PaginationInput>;
+  tag?: InputMaybe<Scalars['String']>;
 };
 
 export type GetItemsInput = {
+  ids?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
   pagination?: InputMaybe<PaginationInput>;
   upcs?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
 };
@@ -86,6 +85,11 @@ export type GetItemsInput = {
 export type GetOrdersInput = {
   ids?: InputMaybe<Array<InputMaybe<Scalars['ID']>>>;
   userId: Scalars['ID'];
+};
+
+export type GetTagsInput = {
+  category?: InputMaybe<Scalars['String']>;
+  pagination?: InputMaybe<PaginationInput>;
 };
 
 export type GetUsersInput = {
@@ -146,8 +150,9 @@ export type Query = {
   carts: Array<Maybe<Cart>>;
   categories: Array<Maybe<Category>>;
   items: Array<Maybe<Item>>;
-  itemsByCategory: Array<Maybe<Item>>;
+  itemsByFilter: Array<Maybe<Item>>;
   orders: Array<Maybe<Order>>;
+  tags: Array<Maybe<Tag>>;
   users: Array<Maybe<User>>;
 };
 
@@ -167,13 +172,18 @@ export type QueryItemsArgs = {
 };
 
 
-export type QueryItemsByCategoryArgs = {
-  getItemsByCategoryInput?: InputMaybe<GetItemsByCategoryInput>;
+export type QueryItemsByFilterArgs = {
+  getItemsByFilterInput?: InputMaybe<GetItemsByFilterInput>;
 };
 
 
 export type QueryOrdersArgs = {
   getOrdersInput?: InputMaybe<GetOrdersInput>;
+};
+
+
+export type QueryTagsArgs = {
+  getTagsInput?: InputMaybe<GetTagsInput>;
 };
 
 
@@ -184,6 +194,12 @@ export type QueryUsersArgs = {
 export type SubmitOrderInput = {
   cartId: Scalars['ID'];
   userId: Scalars['ID'];
+};
+
+export type Tag = {
+  __typename?: 'Tag';
+  name?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
 };
 
 export type UpdateItemInCartInput = {
@@ -213,12 +229,12 @@ export type GetItemsQueryVariables = Exact<{
 
 export type GetItemsQuery = { __typename?: 'Query', items: Array<{ __typename?: 'Item', id: string, name: string, unit_size?: number | null, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, image?: string | null } | null> };
 
-export type GetItemsByCategoryQueryVariables = Exact<{
-  getItemsByCategoryInput?: InputMaybe<GetItemsByCategoryInput>;
+export type GetItemsByFilterQueryVariables = Exact<{
+  getItemsByFilterInput?: InputMaybe<GetItemsByFilterInput>;
 }>;
 
 
-export type GetItemsByCategoryQuery = { __typename?: 'Query', itemsByCategory: Array<{ __typename?: 'Item', id: string, name: string, unit_size?: number | null, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, image?: string | null } | null> };
+export type GetItemsByFilterQuery = { __typename?: 'Query', itemsByFilter: Array<{ __typename?: 'Item', id: string, name: string, unit_size?: number | null, price: number, upc1?: string | null, upc2?: string | null, nacs_category?: string | null, nacs_subcategory?: string | null, image?: string | null } | null> };
 
 export type GetOrdersQueryVariables = Exact<{
   getOrdersInput?: InputMaybe<GetOrdersInput>;
@@ -254,6 +270,13 @@ export type GetCategoriesQueryVariables = Exact<{
 
 
 export type GetCategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', name?: string | null, value?: string | null, image?: string | null } | null> };
+
+export type GetTagsQueryVariables = Exact<{
+  getTagsInput?: InputMaybe<GetTagsInput>;
+}>;
+
+
+export type GetTagsQuery = { __typename?: 'Query', tags: Array<{ __typename?: 'Tag', name?: string | null, value?: string | null } | null> };
 
 
 export const GetCartsDocument = gql`
@@ -347,9 +370,9 @@ export function useGetItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetItemsQueryHookResult = ReturnType<typeof useGetItemsQuery>;
 export type GetItemsLazyQueryHookResult = ReturnType<typeof useGetItemsLazyQuery>;
 export type GetItemsQueryResult = Apollo.QueryResult<GetItemsQuery, GetItemsQueryVariables>;
-export const GetItemsByCategoryDocument = gql`
-    query GetItemsByCategory($getItemsByCategoryInput: GetItemsByCategoryInput) {
-  itemsByCategory(getItemsByCategoryInput: $getItemsByCategoryInput) {
+export const GetItemsByFilterDocument = gql`
+    query GetItemsByFilter($getItemsByFilterInput: GetItemsByFilterInput) {
+  itemsByFilter(getItemsByFilterInput: $getItemsByFilterInput) {
     id
     name
     unit_size
@@ -364,32 +387,32 @@ export const GetItemsByCategoryDocument = gql`
     `;
 
 /**
- * __useGetItemsByCategoryQuery__
+ * __useGetItemsByFilterQuery__
  *
- * To run a query within a React component, call `useGetItemsByCategoryQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetItemsByCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetItemsByFilterQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetItemsByFilterQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetItemsByCategoryQuery({
+ * const { data, loading, error } = useGetItemsByFilterQuery({
  *   variables: {
- *      getItemsByCategoryInput: // value for 'getItemsByCategoryInput'
+ *      getItemsByFilterInput: // value for 'getItemsByFilterInput'
  *   },
  * });
  */
-export function useGetItemsByCategoryQuery(baseOptions?: Apollo.QueryHookOptions<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>) {
+export function useGetItemsByFilterQuery(baseOptions?: Apollo.QueryHookOptions<GetItemsByFilterQuery, GetItemsByFilterQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>(GetItemsByCategoryDocument, options);
+        return Apollo.useQuery<GetItemsByFilterQuery, GetItemsByFilterQueryVariables>(GetItemsByFilterDocument, options);
       }
-export function useGetItemsByCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>) {
+export function useGetItemsByFilterLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetItemsByFilterQuery, GetItemsByFilterQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>(GetItemsByCategoryDocument, options);
+          return Apollo.useLazyQuery<GetItemsByFilterQuery, GetItemsByFilterQueryVariables>(GetItemsByFilterDocument, options);
         }
-export type GetItemsByCategoryQueryHookResult = ReturnType<typeof useGetItemsByCategoryQuery>;
-export type GetItemsByCategoryLazyQueryHookResult = ReturnType<typeof useGetItemsByCategoryLazyQuery>;
-export type GetItemsByCategoryQueryResult = Apollo.QueryResult<GetItemsByCategoryQuery, GetItemsByCategoryQueryVariables>;
+export type GetItemsByFilterQueryHookResult = ReturnType<typeof useGetItemsByFilterQuery>;
+export type GetItemsByFilterLazyQueryHookResult = ReturnType<typeof useGetItemsByFilterLazyQuery>;
+export type GetItemsByFilterQueryResult = Apollo.QueryResult<GetItemsByFilterQuery, GetItemsByFilterQueryVariables>;
 export const GetOrdersDocument = gql`
     query GetOrders($getOrdersInput: GetOrdersInput) {
   orders(getOrdersInput: $getOrdersInput) {
@@ -595,3 +618,39 @@ export function useGetCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type GetCategoriesQueryHookResult = ReturnType<typeof useGetCategoriesQuery>;
 export type GetCategoriesLazyQueryHookResult = ReturnType<typeof useGetCategoriesLazyQuery>;
 export type GetCategoriesQueryResult = Apollo.QueryResult<GetCategoriesQuery, GetCategoriesQueryVariables>;
+export const GetTagsDocument = gql`
+    query GetTags($getTagsInput: GetTagsInput) {
+  tags(getTagsInput: $getTagsInput) {
+    name
+    value
+  }
+}
+    `;
+
+/**
+ * __useGetTagsQuery__
+ *
+ * To run a query within a React component, call `useGetTagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTagsQuery({
+ *   variables: {
+ *      getTagsInput: // value for 'getTagsInput'
+ *   },
+ * });
+ */
+export function useGetTagsQuery(baseOptions?: Apollo.QueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, options);
+      }
+export function useGetTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, options);
+        }
+export type GetTagsQueryHookResult = ReturnType<typeof useGetTagsQuery>;
+export type GetTagsLazyQueryHookResult = ReturnType<typeof useGetTagsLazyQuery>;
+export type GetTagsQueryResult = Apollo.QueryResult<GetTagsQuery, GetTagsQueryVariables>;

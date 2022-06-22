@@ -1,4 +1,4 @@
-import react, {useEffect, useContext } from 'react';
+import react, {useEffect, useContext, useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView, FlatList, StatusBar, TextInput,TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -7,7 +7,7 @@ import algoliasearch from 'algoliasearch';
 import { InstantSearch, connectStateResults } from 'react-instantsearch-native';
 import SearchBox from '../../components/SearchBox';
 import InfiniteHits from '../../components/InfiniteHits';
-import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetItemsByCategoryQuery} from '../../generated/graphql'
+import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetItemsByFilterQuery, useGetTagsQuery} from '../../generated/graphql'
 import ItemDetailScreen from '../itemDetailScreen/itemDetailScreen'
 import OrderDetailScreen from '../orderDetailScreen/orderDetailScreen'
 
@@ -106,10 +106,9 @@ const styles = StyleSheet.create({
       borderStyle: "solid",
       borderWidth: 1,
       borderColor: "black",
-      width: 170,
-      height: 230,
+      width: "48%",
       marginVertical:10,
-      padding: 5,
+      padding: 10,
       borderStyle: "solid",
       borderRadius: 10,
       borderColor: "black",
@@ -122,7 +121,7 @@ const styles = StyleSheet.create({
     itemImage: {
       width: "100%",
       aspectRatio: 1,
-      marginBottom: 5
+      marginBottom: 7
     
     
     },
@@ -135,8 +134,7 @@ const styles = StyleSheet.create({
       fontWeight: "600"
     },
     addToCartButton: {
-      width: 25,
-      height: 25,
+      aspectRatio:1,
       backgroundColor: "gray",
       justifyContent:"center",
       alignItems:"center"
@@ -196,6 +194,8 @@ const styles = StyleSheet.create({
   
 export default function SelectItemsScreen({ navigation, route }) {
     const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
+    const [selectedTag, setSelectedTag] = useState(null)
+
     const { category } = route.params
 
     const auth = getAuth();
@@ -220,18 +220,26 @@ export default function SelectItemsScreen({ navigation, route }) {
     pollInterval: 500
   })
   
-  const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchMore: fetchMoreItemsQuery} = useGetItemsByCategoryQuery({ 
+  const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchMore: fetchMoreItemsQuery} = useGetItemsByFilterQuery({ 
     fetchPolicy: 'cache-and-network',
-    variables: { getItemsByCategoryInput: {
-      category: {
-        value: category.value
-      },
+    variables: { getItemsByFilterInput: {
+      category: category.value,
+      tag: selectedTag ? selectedTag.value : null,
       pagination: {
         offset: 0,
         limit: 20
       }
     } }})
   
+    const { loading:getTagsLoading, error:getTagsError, data: getTagsData} = useGetTagsQuery({ 
+      fetchPolicy: 'cache-and-network',
+      variables: { getTagsInput: {
+        category: category.value,
+        pagination: {
+          offset: 0,
+          limit: 5
+        }
+      } }})
   
     const [updateItemInCart, {loading:updateItemInCartLoading, data:updateItemInCartData, error:updateItemInCartError}] = useUpdateItemInCartMutation()
   
@@ -245,6 +253,9 @@ export default function SelectItemsScreen({ navigation, route }) {
   
     if (getItemsLoading && !getItemsData) return <Text>Loading</Text>
     if (getItemsError) return <Text>{getItemsError.message}</Text>
+
+    if (getTagsLoading && !getTagsData) return <Text>Loading</Text>
+    if (getTagsError) return <Text>{getTagsError.message}</Text>
 
     const itemClicked = (item) => {
       navigation.navigate("ItemDetail", {
@@ -276,10 +287,9 @@ export default function SelectItemsScreen({ navigation, route }) {
     const fetchMoreItems = () => {
       fetchMoreItemsQuery({
         variables: {
-          getItemsByCategoryInput: {
-            category: {
-                value: category.value
-            },
+          getItemsByFilterInput: {
+            category: category.value,
+            tag: selectedTag ? selectedTag.value : null,
             pagination: {
               offset: getItemsData.items.length + 1,
             }
@@ -315,21 +325,51 @@ export default function SelectItemsScreen({ navigation, route }) {
     })
   }
 
+  const onSelectTag = (tag, index) => {
+    if (selectedTag && index === selectedTag.index) {
+      setSelectedTag(null)
+    }
+    else {
+      setSelectedTag({
+        value: tag.value,
+        index: index
+      })
+    }
+   
+  }
+
     return (
        <SafeAreaView>
         <View style={styles.container}>
            <FlatList
-        
-       columnWrapperStyle={{  flex: 1,justifyContent: "space-between", marginHorizontal: 20, padding:0}}
+       ListHeaderComponent={
+         <View>
+           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{paddingLeft: 20, marginVertical: 10}}>
+             {
+               getTagsData.tags.map((tag, index) => { return (
+                <TouchableOpacity key={index} style={{backgroundColor: (selectedTag && selectedTag.index == index) ? "gray" : "#EBEBEB", marginRight: 10, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 25}} onPress={() => onSelectTag(tag, index)}>
+                <Text>
+                  {tag.name}
+                </Text>
+              </TouchableOpacity>
+               )})
+             }
+           
+          
+             
+           </ScrollView>
+          </View>
+       }
+       columnWrapperStyle={{  flex: 1,justifyContent: "space-between", padding:0, marginHorizontal: 20}}
         numColumns={2}  
-        data={getItemsData.itemsByCategory}
+        data={getItemsData.itemsByFilter}
         renderItem={ ({item}) => 
           
          
             <TouchableOpacity style={styles.itemView} onPress={() => { itemClicked(item) }}>
                <Image style={styles.itemImage} source={{uri: item.image ? item.image : "https://via.placeholder.com/150"}}/>
               <View style={{width:"100%"}}>
-             <Text numberOfLines={1} style={styles.boldBodyTextSmall}>{item.name}</Text>
+             <Text numberOfLines={2} style={styles.boldBodyTextSmall}>{item.name}</Text>
              <Text style={styles.mutedBodyTextExtraSmall}>Unit Size: {item.unit_size}</Text>
              <View style={{flexDirection: "row", justifyContent: "space-between"}}>
              <Text style={[styles.boldBodyText, {marginTop: 5}]}>${item.price}</Text>
@@ -345,24 +385,23 @@ export default function SelectItemsScreen({ navigation, route }) {
         onEndReached={() => {
         fetchMoreItemsQuery({
             variables: { 
-              getItemsByCategoryInput: {
-                category: {
-                    value: category.value
-                },
+              getItemsByFilterInput: {
+                category: category.value,
+                tag: selectedTag ? selectedTag.value : null,
                 pagination: {
-                  offset: getItemsData.itemsByCategory.length,
+                  offset: getItemsData.itemsByFilter.length,
                   limit: 20
                 }
               }
              },
             updateQuery: (previousResult, { fetchMoreResult }) => {
               // Don't do anything if there weren't any new items
-              if (!fetchMoreResult || fetchMoreResult.itemsByCategory.length === 0) {
+              if (!fetchMoreResult || fetchMoreResult.itemsByFilter.length === 0) {
                 return previousResult;
               }      
               return {
                 // Append the new feed results to the old one
-                itemsByCategory: previousResult.itemsByCategory.concat(fetchMoreResult.itemsByCategory),
+                itemsByFilter: previousResult.itemsByFilter.concat(fetchMoreResult.itemsByFilter),
               };
             },
           });

@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     },
     safeContainer: {
         marginHorizontal: 0,
+        flex:1
     },
     tinyLogo: {
       width: 50,
@@ -92,10 +93,12 @@ const styles = StyleSheet.create({
   
   
   const Results = connectStateResults(({ searchState, children }) => {
-      console.log(searchState.query)
+    
     return (searchState && searchState.query  ? (
         children
-      ) : null
+      ) : <View style={{justifyContent:"center", alignItems:"center", flexDirection:"row"}}>
+      <Text>Start typing to search!</Text>
+  </View>
     )
   }
     
@@ -104,8 +107,9 @@ const styles = StyleSheet.create({
 export default function SearchResultsScreen({ navigation, route }) {
 
     const goToItemDetail = (item) => {
+        console.log(item.id)
         navigation.navigate("ItemDetail", {
-           upcCode: item.upc1 
+           id: item.id
         })
     }
     return (
@@ -113,13 +117,11 @@ export default function SearchResultsScreen({ navigation, route }) {
             <View style={styles.safeContainer}>
              <InstantSearch searchClient={searchClient} indexName="item-index">
             <SearchBox />
-            <Results>
+            <Results >
              <InfiniteHits goToItemDetail={goToItemDetail} />
             </Results>     
           </InstantSearch>
-            <View style={{justifyContent:"center", alignItems:"center", flexDirection:"row"}}>
-                <Text>Start typing to search!</Text>
-            </View>
+        
             
           
             </View>

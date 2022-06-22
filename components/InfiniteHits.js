@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 
 const InfiniteHits = ({ hits, hasMore, refineNext, goToItemDetail}) => {
   return (
-    <View>
+    <View style={{flex:1}}>
     
         <FlatList
           data={hits}

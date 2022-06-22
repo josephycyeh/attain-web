@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 15,
     marginRight: 15,
-    width: 250,
+    width: "90%",
     display:"flex",
     flexDirection: "row",
     justifyContent:"space-between",
@@ -120,10 +120,9 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "black",
-    width: 170,
-    height: 230,
+    width: "48%",
     marginVertical:10,
-    padding: 5,
+    padding: 10,
     borderStyle: "solid",
     borderRadius: 10,
     borderColor: "black",
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
   itemImage: {
     width: "100%",
     aspectRatio: 1,
-    marginBottom: 5
+    marginBottom: 7
   
   
   },
@@ -149,8 +148,7 @@ const styles = StyleSheet.create({
     fontWeight: "600"
   },
   addToCartButton: {
-    width: 25,
-    height: 25,
+    aspectRatio:1,
     backgroundColor: "gray",
     justifyContent:"center",
     alignItems:"center"
@@ -169,16 +167,16 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 40,
     backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    padding: 10
+    padding: 0
     
   },
   searchBarInsideView: {
 
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems:"center"
+    justifyContent: "space-between",
+    alignItems:"center",
+    flex:1,
+    paddingHorizontal: 5
   },
 
   mutedBodyText: {
@@ -196,7 +194,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 15,
     marginRight: 15,
-    width: 110,
+    width: "30%",
     display:"flex",
     flexDirection: "row",
     justifyContent:"center",
@@ -353,10 +351,15 @@ const categorySelected = (category) => {
       <View style={styles.searchBarContainer}>
       <TouchableOpacity style={styles.searchBar} onPress={searchBarPressed}>
       <View style={styles.searchBarInsideView}>
+      <View style={{flexDirection:"row", alignItems:"center", flex:1, height: "100%"}}>
       <Ionicons name="search" size={24} color="black"/>
-      <Text style={[styles.mutedBodyText, {marginTop:3}]}>
+      <Text style={[styles.boldBodyText, {marginTop:3}]}>
         Search
       </Text>
+      </View>
+      <TouchableOpacity style={{height: "100%", flexDirection:"row", alignItems:"center"}}>
+        <Ionicons name="ios-scan" size={24} color="black"></Ionicons>
+      </TouchableOpacity>
       </View>
       </TouchableOpacity>
       </View>
@@ -370,7 +373,7 @@ const categorySelected = (category) => {
     </View>
    
     <View style={styles.orderSectionView}>
-    <Text style={[styles.titleText, {marginBottom: 15}]}>
+    <Text style={[styles.titleText, {marginBottom: 15}]} >
             Categories
           </Text>
 
@@ -386,7 +389,7 @@ const categorySelected = (category) => {
             <Image style={styles.categoryImage} source={{uri: category.image}}>
 
             </Image>
-           <Text style={[styles.bodyText, {textAlign:"center"}]}>
+           <Text style={[styles.bodyText, {textAlign:"center", flex: 1}]} numberOfLines={1} >
               {category.name}
             </Text>  
           
@@ -405,7 +408,11 @@ const categorySelected = (category) => {
             {getOrdersData.orders.length > 1 ? "Click To See Detail" : "No orders yet"} 
           </Text>
         
-    <ScrollView style={styles.scrollView} horizontal={true}> 
+    <ScrollView contentContainerStyle={{
+            flexGrow: 1,
+            width: '100%',
+          }}
+          style={styles.scrollView} horizontal={true}> 
       {getOrdersData.orders.map((order) => {
         return (
           
@@ -456,9 +463,9 @@ const categorySelected = (category) => {
             <TouchableOpacity style={styles.itemView} onPress={() => { itemClicked(item) }}>
                <Image style={styles.itemImage} source={{uri: item.image ? item.image : "https://via.placeholder.com/150"}}/>
               <View style={{width:"100%"}}>
-             <Text numberOfLines={1} style={styles.boldBodyTextSmall}>{item.name}</Text>
+             <Text numberOfLines={2} style={styles.boldBodyTextSmall}>{item.name}</Text>
              <Text style={styles.mutedBodyTextExtraSmall}>Unit Size: {item.unit_size}</Text>
-             <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+             <View style={{flexDirection: "row", justifyContent: "space-between",}}>
              <Text style={[styles.boldBodyText, {marginTop: 5}]}>${item.price}</Text>
              <TouchableOpacity style={styles.addToCartButton} onPress={() => addItemToCart(item)}>
               <Ionicons style={{textAlign:"center"}} name="add" size={24} color="black" />

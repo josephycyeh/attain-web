@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
 export default function ItemDetailScreen({ navigation, route }) {
     const [showAddedToCartPopup, setShowAddedToCartPopup] = useState(false);
     const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext)
-    const { upcCode } = route.params
+    const { id } = route.params
     const {loading:getCartsLoading, data:getCartsData, error: getCartsError} = useGetCartsQuery({
         fetchPolicy:"network-only",
         variables: {
@@ -101,7 +101,7 @@ export default function ItemDetailScreen({ navigation, route }) {
     const { loading, error, data } = useGetItemsQuery({ 
         fetchPolicy: 'network-only',
         variables: { getItemsInput: {
-            upcs: [upcCode],
+            ids: [id],
             pagination: {
                 limit: 1,
                 offset: 0

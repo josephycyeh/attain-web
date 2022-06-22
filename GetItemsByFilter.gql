@@ -1,0 +1,13 @@
+query GetItemsByFilter($getItemsByFilterInput: GetItemsByFilterInput) {
+  itemsByFilter(getItemsByFilterInput: $getItemsByFilterInput) {
+    id
+    name
+    unit_size
+    price
+    upc1
+    upc2
+    nacs_category
+    nacs_subcategory
+    image
+  }
+}

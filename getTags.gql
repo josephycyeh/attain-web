@@ -1,0 +1,6 @@
+query GetTags($getTagsInput: GetTagsInput) {
+  tags(getTagsInput: $getTagsInput) {
+    name
+    value
+  }
+}
