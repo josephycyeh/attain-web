@@ -11,4 +11,3 @@ query GetItems($getItemsInput: GetItemsInput) {
     image
   }
 }
-

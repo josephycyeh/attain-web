@@ -1,47 +1,49 @@
-import React from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
-import PropTypes from 'prop-types';
-import { connectInfiniteHits } from 'react-instantsearch-native';
-import Highlight from './Highlight';
+import React from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import PropTypes from "prop-types";
+import { connectInfiniteHits } from "react-instantsearch-native";
+import Highlight from "./Highlight";
 
 const styles = StyleSheet.create({
   separator: {
     borderBottomWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
   item: {
     padding: 10,
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   titleText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 
-const InfiniteHits = ({ hits, hasMore, refineNext, goToItemDetail}) => {
+const InfiniteHits = ({ hits, hasMore, refineNext, goToItemDetail }) => {
   return (
-    <View style={{flex:1}}>
-    
-        <FlatList
-          data={hits}
-          keyExtractor={item => item.objectID}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          onEndReached={() => hasMore && refineNext()}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => goToItemDetail(item)}>
-              
-            <View style={styles.item} key={item.objectID} >
+    <View style={{ flex: 1 }}>
+      <FlatList
+        data={hits}
+        keyExtractor={(item) => item.objectID}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        onEndReached={() => hasMore && refineNext()}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => goToItemDetail(item)}>
+            <View style={styles.item} key={item.objectID}>
               <Text style={styles.titleText}>
                 <Highlight attribute="name" hit={item} />
               </Text>
             </View>
-            </TouchableOpacity>
-          )}
-        />
-      
+          </TouchableOpacity>
+        )}
+      />
     </View>
-  
-  )
+  );
 };
 
 InfiniteHits.propTypes = {

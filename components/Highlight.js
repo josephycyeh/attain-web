@@ -1,11 +1,11 @@
-import React from 'react';
-import { Text } from 'react-native';
-import PropTypes from 'prop-types';
-import { connectHighlight } from 'react-instantsearch-native';
+import React from "react";
+import { Text } from "react-native";
+import PropTypes from "prop-types";
+import { connectHighlight } from "react-instantsearch-native";
 
 const Highlight = ({ attribute, hit, highlight }) => {
   const highlights = highlight({
-    highlightProperty: '_highlightResult',
+    highlightProperty: "_highlightResult",
     attribute,
     hit,
   });
@@ -14,7 +14,7 @@ const Highlight = ({ attribute, hit, highlight }) => {
     <Text>
       {highlights.map(({ value, isHighlighted }, index) => {
         const style = {
-          backgroundColor: isHighlighted ? 'yellow' : 'transparent',
+          backgroundColor: isHighlighted ? "yellow" : "transparent",
         };
 
         return (

@@ -1,4 +1,4 @@
-import react, { useEffect, useContext, useState } from "react";
+import react, { useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -12,6 +12,8 @@ import {
   Image,
   Alert,
   Platform,
+  Dimensions,
+  PixelRatio
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -26,12 +28,12 @@ import {
   useGetCartsQuery,
   useUpdateItemInCartMutation,
   useAddItemToCartMutation,
-  useGetItemsByFilterQuery,
-  useGetTagsQuery,
+  useGetCategoriesQuery,
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
 
+import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
 import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -40,15 +42,51 @@ import axios from "axios";
 
 import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
+
+
+
+
+
+
+
+const screenWidth = Dimensions.get('window').width;
+const fontScale = PixelRatio.getFontScale()
+
+const fontMultiplier = (scaler) => {
+  if (scaler >= 1.6) {
+    return 0.7
+  }
+
+  if (scaler >= 1.3) {
+    return 0.90
+  }
+
+  if (scaler >= 1.1) {
+    return 0.95
+  }
+
+  return 1
+}
+const fontScaler = (fontScale * fontMultiplier(fontScale))
+console.log(fontScale)
+console.log(fontScaler)
+const searchClient = algoliasearch(
+  "latency",
+  "6be0576ff61c053d5f9a3225e2a90f76"
+);
+
+const Results = connectStateResults(({ searchState, children }) =>
+  searchState && searchState.query ? children : null
+);
+
 const styles = StyleSheet.create({
   homeContainer: {
     flex: 1,
     paddingTop: 0,
-    backgroundColor: "red",
+    backgroundColor: "white",
   },
   container: {
     backgroundColor: "white",
-    paddingTop: 10,
   },
   statusBar: {
     marginTop: -50,
@@ -56,11 +94,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#3C95FF",
   },
   orderSectionView: {
-    marginLeft: 20,
     marginTop: 30,
-    marginRight: 20,
   },
-  scrollView: {},
+  scrollView: {
+    paddingLeft: 20, marginVertical: 10,
+  },
   titleText: {
     fontSize: 20,
     fontWeight: "600",
@@ -77,8 +115,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 10,
     borderRadius: 15,
-    marginRight: 15,
-    width: 250,
+    marginHorizontal: 20,
+    marginBottom: 15,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -102,7 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   bodyText: {
-    fontSize: 15,
+    fontSize: 15 * fontScaler
   },
   bodyTextSmall: {
     fontSize: 12,
@@ -161,14 +199,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 40,
     backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    padding: 10,
+    padding: 0,
   },
   searchBarInsideView: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
+    flex: 1,
+    paddingHorizontal: 5,
   },
 
   mutedBodyText: {
@@ -184,23 +222,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 15,
     marginRight: 15,
-    width: 110,
+    width: screenWidth * 0.25 * fontScaler * fontScaler,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
   },
   categoryImage: {
-    width: "70%",
+    width: "65%",
     aspectRatio: 1,
     marginBottom: 5,
+ 
   },
 });
 
-export default function SelectItemsScreen({ navigation, route }) {
+function OrderComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
-  const [selectedTag, setSelectedTag] = useState(null);
-
-  const { category } = route.params;
 
   const auth = getAuth();
 
@@ -237,12 +273,10 @@ export default function SelectItemsScreen({ navigation, route }) {
     error: getItemsError,
     data: getItemsData,
     fetchMore: fetchMoreItemsQuery,
-  } = useGetItemsByFilterQuery({
+  } = useGetItemsQuery({
     fetchPolicy: "cache-and-network",
     variables: {
-      getItemsByFilterInput: {
-        category: category.value,
-        tag: selectedTag ? selectedTag.value : null,
+      getItemsInput: {
         pagination: {
           offset: 0,
           limit: 20,
@@ -252,17 +286,16 @@ export default function SelectItemsScreen({ navigation, route }) {
   });
 
   const {
-    loading: getTagsLoading,
-    error: getTagsError,
-    data: getTagsData,
-  } = useGetTagsQuery({
+    loading: getCategoriesLoading,
+    error: getCategoriesError,
+    data: getCategoriesData,
+  } = useGetCategoriesQuery({
     fetchPolicy: "cache-and-network",
     variables: {
-      getTagsInput: {
-        category: category.value,
+      getCategoriesInput: {
         pagination: {
           offset: 0,
-          limit: 5,
+          limit: 20,
         },
       },
     },
@@ -286,12 +319,11 @@ export default function SelectItemsScreen({ navigation, route }) {
   if (getItemsLoading && !getItemsData) return <Text>Loading</Text>;
   if (getItemsError) return <Text>{getItemsError.message}</Text>;
 
-  if (getTagsLoading && !getTagsData) return <Text>Loading</Text>;
-  if (getTagsError) return <Text>{getTagsError.message}</Text>;
-
+  if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
+  if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
   const itemClicked = (item) => {
     navigation.navigate("ItemDetail", {
-      upcCode: item.upc1,
+      id: item.id,
     });
   };
 
@@ -312,9 +344,7 @@ export default function SelectItemsScreen({ navigation, route }) {
   const fetchMoreItems = () => {
     fetchMoreItemsQuery({
       variables: {
-        getItemsByFilterInput: {
-          category: category.value,
-          tag: selectedTag ? selectedTag.value : null,
+        getItemsInput: {
           pagination: {
             offset: getItemsData.items.length + 1,
           },
@@ -350,138 +380,119 @@ export default function SelectItemsScreen({ navigation, route }) {
     });
   };
 
-  const onSelectTag = (tag, index) => {
-    if (selectedTag && index === selectedTag.index) {
-      setSelectedTag(null);
-    } else {
-      setSelectedTag({
-        value: tag.value,
-        index: index,
-      });
-    }
-  };
-
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <FlatList
-          ListHeaderComponent={
-            <View>
-              <ScrollView
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                style={{ paddingLeft: 20, marginVertical: 10 }}
-              >
-                {getTagsData.tags.map((tag, index) => {
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      style={{
-                        backgroundColor:
-                          selectedTag && selectedTag.index == index
-                            ? "gray"
-                            : "#EBEBEB",
-                        marginRight: 10,
-                        paddingHorizontal: 7,
-                        paddingVertical: 5,
-                        borderRadius: 25,
-                      }}
-                      onPress={() => onSelectTag(tag, index)}
-                    >
-                      <Text>{tag.name}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
+    <View style={styles.homeContainer}>
+      <SafeAreaView style={styles.container}>
+        <FlatList 
+        ListHeaderComponent={
+            <View style={{marginHorizontal: 20}}>
+                <Text style={styles.titleText}>Past Orders</Text>
             </View>
-          }
-          columnWrapperStyle={{
-            flex: 1,
-            justifyContent: "space-between",
-            padding: 0,
-            marginHorizontal: 20,
-          }}
-          numColumns={2}
-          data={getItemsData.itemsByFilter}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.itemView}
-              onPress={() => {
-                itemClicked(item);
-              }}
-            >
-              <Image
-                style={styles.itemImage}
-                source={{
-                  uri: item.image
-                    ? item.image
-                    : "https://via.placeholder.com/150",
-                }}
-              />
-              <View style={{ width: "100%" }}>
-                <Text numberOfLines={2} style={styles.boldBodyTextSmall}>
-                  {item.name}
-                </Text>
-                <Text style={styles.mutedBodyTextExtraSmall}>
-                  Unit Size: {item.unit_size}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={[styles.boldBodyText, { marginTop: 5 }]}>
-                    ${item.price}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.addToCartButton}
-                    onPress={() => addItemToCart(item)}
+        }
+        data={getOrdersData.orders}
+        renderItem={({item}) => {
+            return (
+                <TouchableOpacity
+                style={styles.orderView}
+                key={item.id}
+                onPress={() => orderPressed(item)}
+              >
+                <View>
+                  <Text
+                  
+                    style={[
+                      styles.bodyText,
+                      { textAlign: "left", marginBottom: 5 },
+                    ]}
                   >
-                    <Ionicons
-                      style={{ textAlign: "center" }}
-                      name="add"
-                      size={24}
-                      color="black"
-                    />
-                  </TouchableOpacity>
+                    {new Date(item.date_submitted).toDateString()}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.mutedBodyTextSmall,
+                      { textAlign: "left", marginBottom: 5 },
+                    ]}
+                  >
+                    Order#: {item.id}
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      { textAlign: "left", marginBottom: 0 },
+                    ]}
+                  >
+                    Status
+                  </Text>
                 </View>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-          onEndReached={() => {
-            fetchMoreItemsQuery({
-              variables: {
-                getItemsByFilterInput: {
-                  category: category.value,
-                  tag: selectedTag ? selectedTag.value : null,
-                  pagination: {
-                    offset: getItemsData.itemsByFilter.length,
-                    limit: 20,
-                  },
-                },
-              },
-              updateQuery: (previousResult, { fetchMoreResult }) => {
-                // Don't do anything if there weren't any new items
-                if (
-                  !fetchMoreResult ||
-                  fetchMoreResult.itemsByFilter.length === 0
-                ) {
-                  return previousResult;
-                }
-                return {
-                  // Append the new feed results to the old one
-                  itemsByFilter: previousResult.itemsByFilter.concat(
-                    fetchMoreResult.itemsByFilter
-                  ),
-                };
-              },
-            });
-          }}
-          onEndReachedThreshold={0.3}
-        />
-      </View>
-    </SafeAreaView>
+                <View>
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      { textAlign: "right", marginBottom: 5 },
+                    ]}
+                  >
+                    ${item.subtotal}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.mutedBodyTextSmall,
+                      { textAlign: "right", marginBottom: 5 },
+                    ]}
+                  >
+                    {item.orderItems.length} Items
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      { textAlign: "right", marginBottom: 0 },
+                    ]}
+                  >
+                    {item.status}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+                
+            )
+        }}>
+
+        </FlatList>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+const OrderStack = createStackNavigator();
+export default function OrderScreen() {
+  return (
+    <OrderStack.Navigator>
+      <OrderStack.Screen
+        name="OrdersScreen"
+        component={OrderComponent}
+        options={{ title: "Orders" }}
+ 
+      />
+      <OrderStack.Screen
+        name="ItemDetail"
+        component={ItemDetailScreen}
+        options={{ title: "Item Details" }}
+      />
+      <OrderStack.Screen
+        name="OrderDetail"
+        component={OrderDetailScreen}
+        options={{ title: "Order Details" }}
+      />
+      <OrderStack.Screen
+        name="SelectItems"
+        component={SelectItemsScreen}
+        options={({ route }) => ({ title: route.params.title })}
+      />
+      <OrderStack.Screen
+        name="SearchResults"
+        component={SearchResultsScreen}
+        options={{ title: "Search Results" }}
+      />
+    </OrderStack.Navigator>
   );
 }
