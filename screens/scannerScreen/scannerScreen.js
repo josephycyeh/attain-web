@@ -3,10 +3,13 @@ import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button } f
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Amplitude } from '@amplitude/react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import ItemDetailScreen from '../itemDetailScreen/itemDetailScreen'
 const opacity = 'rgba(0, 0, 0, .6)';
 
+const ampInstance = Amplitude.getInstance();
+ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
 const styles = StyleSheet.create({
   container: {
     flex: 1,

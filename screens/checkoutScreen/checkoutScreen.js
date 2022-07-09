@@ -3,10 +3,15 @@ import { StyleSheet, Text, View, SafeAreaView, ScrollView, StatusBar, Button,Tou
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Amplitude } from '@amplitude/react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useGetCartsQuery, useSubmitOrderMutation } from '../../generated/graphql'
 import { UserContext } from '../../context/userContext'
 import { format, add } from 'date-fns'
+
+const ampInstance = Amplitude.getInstance();
+ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -181,6 +186,7 @@ export default function CheckoutScreen({ navigation, route}) {
     const submitOrderClicked = () => {
         try {
             console.log(user.id)
+
             submitOrder({
                 variables: {
                     submitOrderInput: {

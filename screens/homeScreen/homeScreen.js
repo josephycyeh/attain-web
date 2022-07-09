@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import algoliasearch from 'algoliasearch';
 import { InstantSearch, connectStateResults } from 'react-instantsearch-native';
+import { Amplitude } from '@amplitude/react-native';
 import SearchBox from '../../components/SearchBox';
 import InfiniteHits from '../../components/InfiniteHits';
 import { useGetItemsQuery, useGetOrdersQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetCategoriesQuery } from '../../generated/graphql'
@@ -22,6 +23,9 @@ import axios from "axios"
 
 import { UserContext } from '../../context/userContext'
 import { getAuth, signOut } from "firebase/auth";
+
+const ampInstance = Amplitude.getInstance();
+ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
 
 const searchClient = algoliasearch(
   'latency',
@@ -383,7 +387,11 @@ const categorySelected = (category) => {
       {getCategoriesData.categories.map((category) => {
         return (
           
-          <TouchableOpacity style={styles.categoryView} key={category.name} onPress={() => categorySelected(category)}> 
+          <TouchableOpacity style={styles.categoryView} key={category.name} onPress={() => {
+            categorySelected(category);
+            ampInstance.logEvent('CATEGORY_CLICKED')
+            ampInstance.trackingSessionEvents(true);
+            }}> 
           <View style={{
     flexDirection: "column", alignItems:"center", flex:1}}>
             <Image style={styles.categoryImage} source={{uri: category.image}}>
@@ -416,7 +424,11 @@ const categorySelected = (category) => {
       {getOrdersData.orders.map((order) => {
         return (
           
-          <TouchableOpacity style={styles.orderView} key={order.id} onPress={() => orderPressed(order)}> 
+          <TouchableOpacity style={styles.orderView} key={order.id} onPress={() => {
+            orderPressed(order);
+            ampInstance.logEvent('ORDERS_CLICKED');
+            ampInstance.trackingSessionEvents(true);
+            }}> 
           <View>
            <Text style={[styles.bodyText, {textAlign: "left", marginBottom: 5}]}>
               {new Date(order.date_submitted).toDateString()}
@@ -460,7 +472,10 @@ const categorySelected = (category) => {
         renderItem={ ({item}) => 
           
          
-            <TouchableOpacity style={styles.itemView} onPress={() => { itemClicked(item) }}>
+            <TouchableOpacity style={styles.itemView} onPress={() => { 
+                itemClicked(item);
+                ampInstance.logEvent('ITEM_CLICKED')
+                }}>
                <Image style={styles.itemImage} source={{uri: item.image ? item.image : "https://via.placeholder.com/150"}}/>
               <View style={{width:"100%"}}>
              <Text numberOfLines={2} style={styles.boldBodyTextSmall}>{item.name}</Text>

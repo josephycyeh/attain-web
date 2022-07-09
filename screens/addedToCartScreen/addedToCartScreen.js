@@ -136,7 +136,9 @@ export default function AddedToCartScreen({ navigation }) {
             <View style={styles.buttonContainer}>
             <TouchableOpacity
             style={styles.mainButton}
-            >
+            onPress={() => { 
+                ampInstance.logEvent('ADD_TO_CART_CLICKED');
+                }}>
                 <Text style={styles.mainButtonText}>Add To Cart</Text>
                 </TouchableOpacity>
                

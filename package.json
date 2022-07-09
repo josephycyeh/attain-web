@@ -10,6 +10,7 @@
     "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@amplitude/react-native": "^2.12.1",
     "@apollo/client": "^3.5.10",
     "@apollo/react-hooks": "^4.0.0",
     "@graphql-codegen/cli": "^2.6.2",
