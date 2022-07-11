@@ -1,7 +1,6 @@
 import react, { useEffect, useState, useContext } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   ScrollView,
@@ -9,8 +8,10 @@ import {
   Button,
   TouchableOpacity,
   Image,
+  PixelRatio
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
+import Text from '../../components/Text'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { BarCodeScanner } from "expo-barcode-scanner";
@@ -24,6 +25,26 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { UserContext } from "../../context/userContext";
+
+const fontScale = PixelRatio.getFontScale()
+
+const fontScalerCalculator = (scaler) => {
+
+  if (scaler >= 1.4) {
+    return 1.25
+  }
+
+  if (scaler >= 1.2) {
+    return 1.2
+  }
+
+  if (scaler >= 1.1) {
+    return 1.1
+  }
+
+  return 1
+}
+const fontScaler = fontScalerCalculator(fontScale)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -282,11 +303,12 @@ function CartScreenComponent({ navigation }) {
                     Price: {cartItem.price}
                   </Text>
                 </View>
+               
                 <View
                   style={{
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    paddingVertical: 15,
+                    paddingVertical: 20
                   }}
                 >
                   <NumericInput
@@ -315,7 +337,8 @@ function CartScreenComponent({ navigation }) {
                     <Text>Delete</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+                </View>
+             
             );
           })}
         </View>
@@ -327,7 +350,11 @@ function CartScreenComponent({ navigation }) {
 const CartStack = createStackNavigator();
 export default function CartScreen() {
   return (
-    <CartStack.Navigator>
+    <CartStack.Navigator screenOptions={({ route }) => ({
+      headerTitleStyle: {
+        fontSize: 25 / fontScale
+      },
+    })}>
       <CartStack.Screen
         name="CartScreen"
         component={CartScreenComponent}

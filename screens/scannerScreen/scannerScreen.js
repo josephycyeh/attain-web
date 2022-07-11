@@ -7,6 +7,7 @@ import {
   ScrollView,
   StatusBar,
   Button,
+  PixelRatio
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -15,6 +16,25 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 const opacity = "rgba(0, 0, 0, .6)";
 
+const fontScale = PixelRatio.getFontScale()
+
+const fontScalerCalculator = (scaler) => {
+
+  if (scaler >= 1.4) {
+    return 1.25
+  }
+
+  if (scaler >= 1.2) {
+    return 1.2
+  }
+
+  if (scaler >= 1.1) {
+    return 1.1
+  }
+
+  return 1
+}
+const fontScaler = fontScalerCalculator(fontScale)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -122,7 +142,11 @@ function ScannerScreenComponent({ navigation }) {
 const ScannerScreenStack = createStackNavigator();
 export default function ScannerScreen() {
   return (
-    <ScannerScreenStack.Navigator initialRouteName="Attain">
+    <ScannerScreenStack.Navigator screenOptions={({ route }) => ({
+      headerTitleStyle: {
+        fontSize: 25 / fontScale
+      },
+    })} initialRouteName="Attain">
       <ScannerScreenStack.Screen
         name="Scanner"
         component={ScannerScreenComponent}

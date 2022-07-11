@@ -1,7 +1,6 @@
 import react, { useEffect, useContext } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   ScrollView,
@@ -15,6 +14,7 @@ import {
   Dimensions,
   PixelRatio
 } from "react-native";
+import Text from "../../components/Text"
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   bodyText: {
-    fontSize: 15 * fontScaler
+    fontSize: 15
   },
   bodyTextSmall: {
     fontSize: 12,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 15,
     marginRight: 15,
-    width: screenWidth * 0.25 * fontScaler * fontScaler,
+    width: screenWidth * 0.25 * fontScaler,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -251,81 +251,13 @@ function OrderComponent({ navigation }) {
         userId: user.id,
       },
     },
-    pollInterval: 500,
+    pollInterval: 3000,
   });
 
-  const {
-    loading: getCartsLoading,
-    data: getCartsData,
-    error: getCartsError,
-  } = useGetCartsQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      getCartsInput: {
-        userId: user.id,
-      },
-    },
-    pollInterval: 500,
-  });
 
-  const {
-    loading: getItemsLoading,
-    error: getItemsError,
-    data: getItemsData,
-    fetchMore: fetchMoreItemsQuery,
-  } = useGetItemsQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      getItemsInput: {
-        pagination: {
-          offset: 0,
-          limit: 20,
-        },
-      },
-    },
-  });
-
-  const {
-    loading: getCategoriesLoading,
-    error: getCategoriesError,
-    data: getCategoriesData,
-  } = useGetCategoriesQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      getCategoriesInput: {
-        pagination: {
-          offset: 0,
-          limit: 20,
-        },
-      },
-    },
-  });
-
-  const [
-    updateItemInCart,
-    {
-      loading: updateItemInCartLoading,
-      data: updateItemInCartData,
-      error: updateItemInCartError,
-    },
-  ] = useUpdateItemInCartMutation();
-
-  if (getCartsLoading && !getCartsData) return <Text>Loading</Text>;
-  if (getCartsError) return <Text>{getCartsError.message}</Text>;
 
   if (getOrdersLoading && !getOrdersData) return <Text>Loading</Text>;
   if (getOrdersError) return <Text>{getOrdersError.message}</Text>;
-
-  if (getItemsLoading && !getItemsData) return <Text>Loading</Text>;
-  if (getItemsError) return <Text>{getItemsError.message}</Text>;
-
-  if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
-  if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
-  const itemClicked = (item) => {
-    navigation.navigate("ItemDetail", {
-      id: item.id,
-    });
-  };
 
   const orderPressed = (order) => {
     navigation.navigate("OrderDetail", {
@@ -333,52 +265,6 @@ function OrderComponent({ navigation }) {
     });
   };
 
-  const logoutButtonPressed = async () => {
-    await signOut(auth);
-  };
-
-  const searchBarPressed = () => {
-    navigation.navigate("SearchResults");
-  };
-
-  const fetchMoreItems = () => {
-    fetchMoreItemsQuery({
-      variables: {
-        getItemsInput: {
-          pagination: {
-            offset: getItemsData.items.length + 1,
-          },
-        },
-      },
-    });
-  };
-
-  const cart = getCartsData.carts[0];
-  const addItemToCart = (item) => {
-    var quantityToBeUpdated = 1;
-    const checkItemId = (cartItem) => cartItem.item_id == item.id;
-    if (cart.cartItems.some(checkItemId)) {
-      quantityToBeUpdated += cart.cartItems.find(
-        (cartItem) => cartItem.item_id == item.id
-      ).quantity;
-    }
-    updateItemInCart({
-      variables: {
-        updateItemInCartInput: {
-          cartId: cart.id,
-          itemId: item.id,
-          quantity: quantityToBeUpdated,
-        },
-      },
-    });
-  };
-
-  const categorySelected = (category) => {
-    navigation.navigate("SelectItems", {
-      category: category,
-      title: category.name,
-    });
-  };
 
   return (
     <View style={styles.homeContainer}>
@@ -466,7 +352,11 @@ function OrderComponent({ navigation }) {
 const OrderStack = createStackNavigator();
 export default function OrderScreen() {
   return (
-    <OrderStack.Navigator>
+    <OrderStack.Navigator screenOptions={({ route }) => ({
+      headerTitleStyle: {
+        fontSize: 25 / fontScale
+      },
+    })}>
       <OrderStack.Screen
         name="OrdersScreen"
         component={OrderComponent}

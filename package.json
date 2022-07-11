@@ -38,6 +38,7 @@
     "react-instantsearch-native": "^6.23.0",
     "react-native": "0.64.3",
     "react-native-gesture-handler": "~2.1.0",
+    "react-native-modal": "^13.0.1",
     "react-native-numeric-input": "^1.9.1",
     "react-native-reanimated": "~2.3.1",
     "react-native-safe-area-context": "3.3.2",

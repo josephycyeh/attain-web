@@ -1,7 +1,6 @@
 import react, { useEffect, useContext, useState } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   ScrollView,
@@ -13,6 +12,7 @@ import {
   Alert,
   Platform,
 } from "react-native";
+import Text from "../../components/Text"
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -31,7 +31,7 @@ import {
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
-
+import ItemCard from '../../components/ItemCard'
 import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -291,7 +291,7 @@ export default function SelectItemsScreen({ navigation, route }) {
 
   const itemClicked = (item) => {
     navigation.navigate("ItemDetail", {
-      upcCode: item.upc1,
+      upc: item.upc1
     });
   };
 
@@ -404,51 +404,7 @@ export default function SelectItemsScreen({ navigation, route }) {
           numColumns={2}
           data={getItemsData.itemsByFilter}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.itemView}
-              onPress={() => {
-                itemClicked(item);
-              }}
-            >
-              <Image
-                style={styles.itemImage}
-                source={{
-                  uri: item.image
-                    ? item.image
-                    : "https://via.placeholder.com/150",
-                }}
-              />
-              <View style={{ width: "100%" }}>
-                <Text numberOfLines={2} style={styles.boldBodyTextSmall}>
-                  {item.name}
-                </Text>
-                <Text style={styles.mutedBodyTextExtraSmall}>
-                  Unit Size: {item.unit_size}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={[styles.boldBodyText, { marginTop: 5 }]}>
-                    ${item.price}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.addToCartButton}
-                    onPress={() => addItemToCart(item)}
-                  >
-                    <Ionicons
-                      style={{ textAlign: "center" }}
-                      name="add"
-                      size={24}
-                      color="black"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
+          <ItemCard item={item}/>)}
           keyExtractor={(item) => item.id}
           onEndReached={() => {
             fetchMoreItemsQuery({

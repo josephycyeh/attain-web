@@ -1,8 +1,29 @@
 import React from "react";
-import { StyleSheet, View, TextInput } from "react-native";
+import { StyleSheet, View, TextInput,  PixelRatio } from "react-native";
 import PropTypes from "prop-types";
 import { connectSearchBox } from "react-instantsearch-native";
 
+const fontScale = PixelRatio.getFontScale()
+
+const fontScalerCalculator = (scaler) => {
+
+  if (scaler >= 1.4) {
+    return 1.25
+  }
+
+  if (scaler >= 1.2) {
+    return 1.2
+  }
+
+  if (scaler >= 1.1) {
+    return 1.1
+  }
+
+  return 1
+}
+const fontScaler = fontScalerCalculator(fontScale)
+console.log(fontScale)
+console.log(fontScaler)
 const styles = StyleSheet.create({
   container: {
     padding: 16,
@@ -11,7 +32,7 @@ const styles = StyleSheet.create({
   input: {
     height: 48,
     padding: 12,
-    fontSize: 16,
+    fontSize: 18 / fontScale,
     backgroundColor: "#fff",
     borderRadius: 4,
     borderWidth: 1,

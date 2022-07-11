@@ -1,7 +1,6 @@
 import react, { useEffect, useState, useContext } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   ScrollView,
@@ -15,6 +14,7 @@ import {
   Dimensions,
   PixelRatio
 } from "react-native";
+import Text from '../../components/Text'
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -30,15 +30,8 @@ import {
   useAddItemToCartMutation,
   useGetCategoriesQuery,
 } from "../../generated/graphql";
-import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
-import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
-
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
-import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
-import { Ionicons } from "@expo/vector-icons";
-
-import axios from "axios";
 
 import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
@@ -52,22 +45,23 @@ import { getAuth, signOut } from "firebase/auth";
 const screenWidth = Dimensions.get('window').width;
 const fontScale = PixelRatio.getFontScale()
 
-const fontMultiplier = (scaler) => {
-  if (scaler >= 1.6) {
-    return 0.7
+const fontScalerCalculator = (scaler) => {
+
+  if (scaler >= 1.4) {
+    return 1.25
   }
 
-  if (scaler >= 1.3) {
-    return 0.90
+  if (scaler >= 1.2) {
+    return 1.2
   }
 
   if (scaler >= 1.1) {
-    return 0.95
+    return 1.1
   }
 
   return 1
 }
-const fontScaler = (fontScale * fontMultiplier(fontScale))
+const fontScaler = fontScalerCalculator(fontScale)
 console.log(fontScale)
 console.log(fontScaler)
 const searchClient = algoliasearch(
@@ -223,7 +217,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
     borderRadius: 15,
-    width: screenWidth * 0.42 * fontScaler * fontScaler,
+    width: screenWidth * 0.42,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -236,6 +230,7 @@ const styles = StyleSheet.create({
   },
 });
 
+
 function BrowseScreenComponent({ navigation, route }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const [selectedTag, setSelectedTag] = useState(null);
@@ -244,19 +239,7 @@ function BrowseScreenComponent({ navigation, route }) {
 
   const auth = getAuth();
 
-  const {
-    loading: getOrdersLoading,
-    data: getOrdersData,
-    error: getOrdersError,
-  } = useGetOrdersQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      getOrdersInput: {
-        userId: user.id,
-      },
-    },
-    pollInterval: 500,
-  });
+
 
 
 
@@ -331,7 +314,7 @@ function BrowseScreenComponent({ navigation, route }) {
             </View>
           </TouchableOpacity>
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.name}
         />
       </View>
     </SafeAreaView>
@@ -342,7 +325,11 @@ function BrowseScreenComponent({ navigation, route }) {
 const BrowseStack = createStackNavigator();
 export default function BrowseScreen() {
   return (
-    <BrowseStack.Navigator>
+    <BrowseStack.Navigator screenOptions={({ route }) => ({
+      headerTitleStyle: {
+        fontSize: 25 / fontScale
+      },
+    })}>
       <BrowseStack.Screen
         name="BrowseScreen"
         options={{ title: "Browse" }}

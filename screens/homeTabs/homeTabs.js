@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Text, View } from "react-native";
+import { Text, View, PixelRatio } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -12,6 +12,26 @@ import OrderScreen from "../orderScreen/orderScreen.js";
 import { Ionicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator();
+
+const fontScale = PixelRatio.getFontScale()
+
+const fontScalerCalculator = (scaler) => {
+
+  if (scaler >= 1.4) {
+    return 1.25
+  }
+
+  if (scaler >= 1.2) {
+    return 1.2
+  }
+
+  if (scaler >= 1.1) {
+    return 1.1
+  }
+
+  return 1
+}
+const fontScaler = fontScalerCalculator(fontScale)
 
 export default function App() {
   const HomeIcon = (focused) => {
@@ -54,7 +74,11 @@ export default function App() {
   }
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={({ route }) => ({
+      tabBarLabelStyle: {
+        fontSize: 15 / fontScale,
+      },
+    })}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}

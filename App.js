@@ -36,6 +36,8 @@ import {
   useAddItemToCartMutation,
   useGetUsersQuery,
 } from "./generated/graphql";
+import { enableScreens } from 'react-native-screens';
+enableScreens();
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -96,8 +98,25 @@ function AppComponent() {
         ids: [userId],
       },
     },
+    pollInterval: 2000,
+  });
+
+  const {
+    loading: getCartsLoading,
+    data: getCartsData,
+    error: getCartsError,
+  } = useGetCartsQuery({
+    fetchPolicy: "network-only",
+    skip: userId == null,
+    variables: {
+      getCartsInput: {
+        userId: user.id,
+      },
+    },
     pollInterval: 500,
   });
+
+
 
   useEffect(async () => {
     onAuthStateChanged(auth, async (user) => {
@@ -115,14 +134,22 @@ function AppComponent() {
   }, []);
 
   useEffect(() => {
+
     if (!getUsersLoading && getUsersData) {
       setUser(getUsersData.users[0]);
     }
-  }, [getUsersLoading, getUsersData]);
+    if (!getCartsLoading && getCartsData) {
+      console.log("cart changed 1")
+      setUser({...user, cart: getCartsData.carts[0]})
+    }
+    
+  }, [getUsersLoading, getUsersData, getCartsData, getCartsLoading]);
 
   if (isLoggedIn == null) {
     return <Text>Loading</Text>;
   }
+
+
 
   if (getUsersLoading && !getUsersData) return <Text>Loading</Text>;
   if (getUsersError) return <Text>Error: {getUsersError.message}</Text>;

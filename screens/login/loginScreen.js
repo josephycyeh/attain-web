@@ -1,7 +1,6 @@
 import react, { useEffect, useState, useContext } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   ScrollView,
@@ -13,6 +12,7 @@ import {
   Platform,
   TextInput,
 } from "react-native";
+import Text from "../../components/Text"
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";

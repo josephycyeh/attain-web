@@ -1,7 +1,6 @@
 import react, { useEffect, useState, useContext } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   ScrollView,
@@ -11,6 +10,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import Text from "../../components/Text"
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -174,6 +174,12 @@ export default function OrderDetailScreen({ navigation, route }) {
 
   const order = getOrdersData.orders[0];
 
+  const orderItemPressed = (orderItem) => {
+    navigation.navigate("ItemDetail", {
+      id: orderItem.item_id,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.safeContainer}>
@@ -218,7 +224,7 @@ export default function OrderDetailScreen({ navigation, route }) {
           numColumns={1}
           renderItem={({ item }) => {
             return (
-              <View key={item.id} style={styles.orderItemContainer}>
+              <TouchableOpacity onPress={() => {orderItemPressed(item)}} key={item.id} style={styles.orderItemContainer}>
                 <Text style={styles.boldSecondaryText}>
                   {item.quantity}x {item.name}
                 </Text>
@@ -254,7 +260,7 @@ export default function OrderDetailScreen({ navigation, route }) {
                     </Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
           keyExtractor={(item) => item.id}

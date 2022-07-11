@@ -8,25 +8,27 @@ import {
   Button,
   TouchableOpacity,
   Image,
-  Modal,
+  Dimensions
 } from "react-native";
-import Text from "../../components/Text"
+import Text from "./Text"
 import NumericInput from "react-native-numeric-input";
 import {
   useGetItemsQuery,
   useUpdateItemInCartMutation,
-} from "../../generated/graphql";
-import { UserContext } from "../../context/userContext";
+} from "../generated/graphql";
+import { UserContext } from "../context/userContext";
+import { Ionicons } from '@expo/vector-icons';
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-    backgroundColor: "white",
   },
   safeContainer: {
-    marginHorizontal: 20,
     backgroundColor: "white",
-    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 50,
+    borderRadius: 20
+
+
   },
   tinyLogo: {
     width: 50,
@@ -43,14 +45,15 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
+    marginBottom: 30
   },
   boldMainText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "600",
     marginBottom: 15,
   },
   boldSecondaryText: {
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: "600",
   },
   itemDetailLine: {
@@ -63,7 +66,6 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   quantityContainer: {
-    marginTop: 30,
     marginBottom: 30,
     flexDirection: "row",
     flexWrap: "wrap",
@@ -80,35 +82,20 @@ const styles = StyleSheet.create({
   mainButton: {
     color: "white",
     backgroundColor: "#3C95FF",
-    height: 45,
-    borderRadius: 20,
+    height: 40,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
   mainButtonText: {
-    fontSize: 20,
+    fontSize: 18,
     color: "white",
   },
 });
 
-export default function ItemDetailScreen({ navigation, route }) {
+const AddItemModal = ({item, onClose}) => {
   const [showAddedToCartPopup, setShowAddedToCartPopup] = useState(false);
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
-  const { id, upcCode } = route.params;
-
-  const { loading, error, data } = useGetItemsQuery({
-    fetchPolicy: "network-only",
-    variables: {
-      getItemsInput: {
-        ids: id ? [id] : null,
-        upcs: upcCode ? [upcCode]: null,
-        pagination: {
-          limit: 1,
-          offset: 0,
-        },
-      },
-    },
-  });
 
   const [
     updateItemInCart,
@@ -127,21 +114,6 @@ export default function ItemDetailScreen({ navigation, route }) {
   const cart = user.cart;
 
 
-
-
-  if (loading && !data) return <Text>loading...</Text>;
-  if (error) return <Text>something wrong</Text>;
-
-  if (data.items.length === 0) {
-    return (  
-      <SafeAreaView style={styles.container}>
-        <View style={styles.safeContainer}>
-          <Text>Sorry we don't have that item yet</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-  const item = data.items[0];
   const getItemQuantityInCart = () => {
     const checkItemId = (cartItem) => cartItem.item_id == item.id;
     if (cart.cartItems.some(checkItemId)) {
@@ -166,8 +138,7 @@ export default function ItemDetailScreen({ navigation, route }) {
         },
       },
     });
-    setShowAddedToCartPopup(true);
-    setTimeout(() => setShowAddedToCartPopup(false), 2500);
+    onClose()
     // navigation.goBack()
   };
 
@@ -176,9 +147,7 @@ export default function ItemDetailScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
-
+    <View style={styles.container}>
       {showAddedToCartPopup && (
         <View
           style={{
@@ -225,31 +194,24 @@ export default function ItemDetailScreen({ navigation, route }) {
         </View>
       )}
       <View style={styles.safeContainer}>
+        <View style={{width: "100%", marginBottom: 10, flexDirection:"row",justifyContent:"flex-end"}}>
+        <TouchableOpacity onPress={onClose}>
+            <Ionicons name="close" size={35} color="black" />
+        </TouchableOpacity>
+        </View>
         <View style={styles.itemContainer}>
           <Image style={styles.itemImage} source={{ uri: item.image }} />
           <View style={styles.itemTextContainer}>
             <Text style={styles.boldMainText}>{item.name}</Text>
-            <View style={styles.itemDetailLine}>
-              <Text style={styles.boldSecondaryText}>UPC</Text>
-              <Text style={styles.boldSecondaryText}>{item.upc1}</Text>
-            </View>
+           
             <View style={styles.itemDetailLine}>
               <Text style={styles.boldSecondaryText}>Unit Size</Text>
               <Text style={styles.boldSecondaryText}>{item.unit_size}</Text>
             </View>
             <View style={styles.itemDetailLine}>
-              <Text style={styles.boldSecondaryText}>Category</Text>
-              <Text
-                style={styles.boldSecondaryText}  numberOfLines={1}
-              >{`${item.nacs_category.substring(0, 10)}`}</Text>
-            </View>
+            <Text style={styles.boldSecondaryText}>Price</Text>
+            <Text style={styles.boldSecondaryText}>${item.price}</Text>
           </View>
-        </View>
-       
-        <View style={styles.pricingContainer}>
-          <View style={styles.itemDetailLine}>
-            <Text style={styles.boldMainText}>Price</Text>
-            <Text style={styles.boldMainText}>${item.price}</Text>
           </View>
         </View>
         <View style={styles.quantityContainer}>
@@ -268,7 +230,7 @@ export default function ItemDetailScreen({ navigation, route }) {
           <NumericInput
             initValue={quantity}
             value={quantity}
-            totalHeight={40}
+            totalHeight={35}
             totalWidth={110}
             rounded
             iconSize={100}
@@ -287,6 +249,8 @@ export default function ItemDetailScreen({ navigation, route }) {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
+
+export default AddItemModal

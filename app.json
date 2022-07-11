@@ -2,7 +2,7 @@
   "expo": {
     "name": "Attain Wholesale",
     "slug": "Attain",
-    "version": "11",
+    "version": "60",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "joinattain.com",
@@ -16,7 +16,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "buildNumber": "25",
+      "buildNumber": "60",
       "icon": "./applogo.png",
       "supportsTablet": false,
       "infoPlist": {
@@ -26,7 +26,7 @@
       "bundleIdentifier": "joinattain.com"
     },
     "android": {
-      "versionCode": 9,
+      "versionCode": 60,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

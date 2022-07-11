@@ -182,7 +182,6 @@ export default function CheckoutScreen({ navigation, route }) {
         userId: user.id,
       },
     },
-    pollInterval: 500,
   });
   const onBackToScanPressed = () => {
     navigation.goBack();

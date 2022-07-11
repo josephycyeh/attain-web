@@ -1,13 +1,10 @@
 import react, { useEffect, useContext } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   ScrollView,
   FlatList,
-  StatusBar,
-  TextInput,
   TouchableOpacity,
   Image,
   Alert,
@@ -15,13 +12,11 @@ import {
   Dimensions,
   PixelRatio
 } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Modal from "react-native-modal";
+
+import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
 import algoliasearch from "algoliasearch";
-import { InstantSearch, connectStateResults } from "react-instantsearch-native";
-import SearchBox from "../../components/SearchBox";
-import InfiniteHits from "../../components/InfiniteHits";
 import {
   useGetItemsQuery,
   useGetOrdersQuery,
@@ -38,12 +33,10 @@ import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
 import { Ionicons } from "@expo/vector-icons";
 
-import axios from "axios";
 
 import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
-
-
+import ItemCard from "../../components/ItemCard"
 
 
 
@@ -52,32 +45,27 @@ import { getAuth, signOut } from "firebase/auth";
 const screenWidth = Dimensions.get('window').width;
 const fontScale = PixelRatio.getFontScale()
 
-const fontMultiplier = (scaler) => {
-  if (scaler >= 1.6) {
-    return 0.7
+const fontScalerCalculator = (scaler) => {
+
+  if (scaler >= 1.4) {
+    return 1.25
   }
 
-  if (scaler >= 1.3) {
-    return 0.90
+  if (scaler >= 1.2) {
+    return 1.2
   }
 
   if (scaler >= 1.1) {
-    return 0.95
+    return 1.1
   }
 
   return 1
 }
-const fontScaler = (fontScale * fontMultiplier(fontScale))
+const fontScaler = fontScalerCalculator(fontScale)
 console.log(fontScale)
 console.log(fontScaler)
-const searchClient = algoliasearch(
-  "latency",
-  "6be0576ff61c053d5f9a3225e2a90f76"
-);
 
-const Results = connectStateResults(({ searchState, children }) =>
-  searchState && searchState.query ? children : null
-);
+
 
 const styles = StyleSheet.create({
   homeContainer: {
@@ -116,7 +104,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 15,
     marginRight: 15,
-    width: (screenWidth) * 0.70 * fontScaler * fontScaler,
+    width: (screenWidth) * 0.70 * fontScaler,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -140,7 +128,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   bodyText: {
-    fontSize: 15 * fontScaler
+    fontSize: 15
   },
   bodyTextSmall: {
     fontSize: 12,
@@ -222,7 +210,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 15,
     marginRight: 15,
-    width: screenWidth * 0.25 * fontScaler * fontScaler,
+    width: screenWidth * 0.25 * fontScaler,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -251,7 +239,7 @@ function HomeComponent({ navigation }) {
         userId: user.id,
       },
     },
-    pollInterval: 500,
+    pollInterval: 3000,
   });
 
   const {
@@ -259,7 +247,7 @@ function HomeComponent({ navigation }) {
     data: getCartsData,
     error: getCartsError,
   } = useGetCartsQuery({
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
     variables: {
       getCartsInput: {
         userId: user.id,
@@ -338,20 +326,11 @@ function HomeComponent({ navigation }) {
   };
 
   const searchBarPressed = () => {
+
+
     navigation.navigate("SearchResults");
   };
 
-  const fetchMoreItems = () => {
-    fetchMoreItemsQuery({
-      variables: {
-        getItemsInput: {
-          pagination: {
-            offset: getItemsData.items.length + 1,
-          },
-        },
-      },
-    });
-  };
 
   const cart = getCartsData.carts[0];
   const addItemToCart = (item) => {
@@ -380,22 +359,31 @@ function HomeComponent({ navigation }) {
     });
   };
 
+  const renderItem = ({ item }) => (
+    <ItemCard item={item}/>
+  )
+  
   return (
     <View style={styles.homeContainer}>
       <SafeAreaView style={styles.container}>
         <View style={styles.statusBar}></View>
         <FlatList
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          initialNumToRender={10}
           ListHeaderComponent={
             <>
               <View style={styles.topBarView}>
                 <View style={styles.titleView}>
-                  <Text style={styles.boldSecondaryText}>Attain</Text>
-                  <Text style={styles.boldText}>{user.name}</Text>
+                  <Text maxFontSizeMultiplier={1.4} style={styles.boldSecondaryText}>Attain</Text>
+                  <Text maxFontSizeMultiplier={1.4} style={styles.boldText}>{user.name}</Text>
                   <TouchableOpacity
-                    style={{ position: "absolute", top: 30, right: 30 }}
+                    style={{ position: "absolute", top: 10, right: 20 }}
                     onPress={logoutButtonPressed}
                   >
-                    <Text>Logout</Text>
+                    <View style={{backgroundColor:"#D3D3D3", padding: 7, borderRadius: 10}}>
+                      <Text maxFontSizeMultiplier={1.4}>Logout</Text>
+                    </View>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.searchBarContainer}>
@@ -413,7 +401,7 @@ function HomeComponent({ navigation }) {
                         }}
                       >
                         <Ionicons name="search" size={24} color="black" />
-                        <Text style={[styles.boldBodyText, { marginTop: 3 }]}>
+                        <Text maxFontSizeMultiplier={1.4} style={[styles.boldBodyText, { marginTop: 3 }]}>
                           Search
                         </Text>
                       </View>
@@ -433,19 +421,12 @@ function HomeComponent({ navigation }) {
                     </View>
                   </TouchableOpacity>
                 </View>
-
-                {/* <InstantSearch searchClient={searchClient} indexName="instant_search">
-            <SearchBox />
-            <Results>
-             <InfiniteHits />
-            </Results>     
-          </InstantSearch> */}
               </View>
 
               <View style={styles.orderSectionView}>
                 <View style={{marginHorizontal: 20}}>
-                <Text style={[styles.titleText, { marginBottom: 15 }]}>
-                  Categories
+                <Text maxFontSizeMultiplier={1.4} style={[styles.titleText]}>
+                  Top Categories
                 </Text>
                 </View>
                 <ScrollView style={styles.scrollView} horizontal={true}>
@@ -468,6 +449,7 @@ function HomeComponent({ navigation }) {
                             source={{ uri: category.image }}
                           ></Image>
                           <Text
+                            maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
                               { textAlign: "center", flex: 1},
@@ -483,10 +465,10 @@ function HomeComponent({ navigation }) {
               </View>
               <View style={styles.orderSectionView}>
                 <View style={{marginHorizontal: 20}}>
-                <Text style={[styles.titleText, { marginBottom: 5 }]}>
+                <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
                   Recent Orders
                 </Text>
-                <Text style={[styles.mutedBodyTextSmall, { marginBottom: 10 }]}>
+                <Text maxFontSizeMultiplier={1.4} style={[styles.mutedBodyTextSmall]}>
                   {getOrdersData.orders.length > 1
                     ? "Click To See Detail"
                     : "No orders yet"}
@@ -505,7 +487,7 @@ function HomeComponent({ navigation }) {
                       >
                         <View>
                           <Text
-                          
+                           maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
                               { textAlign: "left", marginBottom: 5 },
@@ -514,6 +496,7 @@ function HomeComponent({ navigation }) {
                             {new Date(order.date_submitted).toDateString()}
                           </Text>
                           <Text
+                           maxFontSizeMultiplier={1.4}
                             style={[
                               styles.mutedBodyTextSmall,
                               { textAlign: "left", marginBottom: 5 },
@@ -523,6 +506,7 @@ function HomeComponent({ navigation }) {
                           </Text>
 
                           <Text
+                            maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
                               { textAlign: "left", marginBottom: 0 },
@@ -533,6 +517,7 @@ function HomeComponent({ navigation }) {
                         </View>
                         <View>
                           <Text
+                            maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
                               { textAlign: "right", marginBottom: 5 },
@@ -541,6 +526,7 @@ function HomeComponent({ navigation }) {
                             ${order.subtotal}
                           </Text>
                           <Text
+                            maxFontSizeMultiplier={1.4}
                             style={[
                               styles.mutedBodyTextSmall,
                               { textAlign: "right", marginBottom: 5 },
@@ -550,6 +536,7 @@ function HomeComponent({ navigation }) {
                           </Text>
 
                           <Text
+                            maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
                               { textAlign: "right", marginBottom: 0 },
@@ -566,7 +553,7 @@ function HomeComponent({ navigation }) {
               <View style={styles.orderSectionView}>
                 <View style={{marginHorizontal: 20}}>
 
-                <Text style={styles.titleText}>Price Book</Text>
+                <Text maxFontSizeMultiplier={1.4} style={styles.titleText}>Price Book</Text>
                 </View>
               </View>
             </>
@@ -579,52 +566,7 @@ function HomeComponent({ navigation }) {
           }}
           numColumns={2}
           data={getItemsData.items}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.itemView}
-              onPress={() => {
-                itemClicked(item);
-              }}
-            >
-              <Image
-                style={styles.itemImage}
-                source={{
-                  uri: item.image
-                    ? item.image
-                    : "https://via.placeholder.com/150",
-                }}
-              />
-              <View style={{ width: "100%" }}>
-                <Text numberOfLines={2} style={styles.boldBodyTextSmall}>
-                  {item.name}
-                </Text>
-                <Text style={styles.mutedBodyTextExtraSmall}>
-                  Unit Size: {item.unit_size}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={[styles.boldBodyText, { marginTop: 5 }]}>
-                    ${item.price}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles.addToCartButton}
-                    onPress={() => addItemToCart(item)}
-                  >
-                    <Ionicons
-                      style={{ textAlign: "center" }}
-                      name="add"
-                      size={24}
-                      color="black"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
+          renderItem={renderItem}
           keyExtractor={(item) => item.id}
           onEndReached={() => {
             console.log(getItemsData.items.length);
@@ -651,16 +593,6 @@ function HomeComponent({ navigation }) {
           }}
           onEndReachedThreshold={0.3}
         />
-        {/*       
-          {getItemsData.items.map((item) => {
-           return ( 
-           <View style={styles.itemView}>
-              <Text>{item.description}</Text>
-              <Text>Case Cost: {item.case_cost}</Text>
-              <Text>Unit Size: {item.unit_size}</Text>
-            </View>
-           )
-          })} */}
       </SafeAreaView>
     </View>
   );
@@ -669,7 +601,11 @@ function HomeComponent({ navigation }) {
 const HomeStack = createStackNavigator();
 export default function HomeScreen() {
   return (
-    <HomeStack.Navigator>
+    <HomeStack.Navigator screenOptions={({ route }) => ({
+      headerTitleStyle: {
+        fontSize: 20 / fontScale
+      },
+    })}>
       <HomeStack.Screen
         name="Attain"
         component={HomeComponent}
