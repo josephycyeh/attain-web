@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Amplitude } from '@amplitude/react-native';
 import HomeScreen from './screens/homeScreen/homeScreen'
 import ScannerScreen from './screens/scannerScreen/scannerScreen'
 import CartScreen from './screens/cartScreen/cartScreen.js'
@@ -115,6 +116,9 @@ function AppComponent() {
 
         setIsLoggedIn(true)
 
+        const ampInstance = Amplitude.getInstance();
+        ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+        ampInstance.trackingSessionEvents(true);
 
       } else {
         setIsLoggedIn(false)

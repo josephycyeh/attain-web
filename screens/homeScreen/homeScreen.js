@@ -281,7 +281,7 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
     navigation.navigate("OrderDetail", {
         orderId: order.id
     })
-    ampInstance.logEvent('ORDERS_CLICKED');
+    ampInstance.logEvent('ORDER_CLICKED');
     ampInstance.trackingSessionEvents(true);
   }
 
