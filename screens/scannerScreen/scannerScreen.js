@@ -85,6 +85,7 @@ function ScannerScreenComponent({ navigation }) {
     }, [navigation]);
     const handleBarCodeScanned = ({ type, data }) => {
       setScanned(true);
+      ampInstance.logEvent('SCANNING_CLICKED');
       navigation.navigate("ItemDetail", {
         upcCode: data,
 

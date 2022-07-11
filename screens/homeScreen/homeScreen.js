@@ -272,14 +272,17 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>
   const itemClicked = (item) => {
     navigation.navigate("ItemDetail", {
-      upcCode: item.upc1
+        upcCode: item.upc1
     })
+    ampInstance.logEvent('ITEM_CLICKED');
   }
 
   const orderPressed = (order) => {
     navigation.navigate("OrderDetail", {
-      orderId: order.id
+        orderId: order.id
     })
+    ampInstance.logEvent('ORDERS_CLICKED');
+    ampInstance.trackingSessionEvents(true);
   }
 
 
@@ -293,7 +296,9 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
 
 
   const searchBarPressed = () => {
-    navigation.navigate("SearchResults")
+    navigation.navigate("SearchResults");
+    ampInstance.logEvent('SEARCH_CLICKED');
+    ampInstance.trackingSessionEvents(true);
   }
 
 
@@ -330,10 +335,12 @@ const { loading:getItemsLoading, error:getItemsError, data: getItemsData, fetchM
 }
 
 const categorySelected = (category) => {
-  navigation.navigate("SelectItems", {
-    category: category,
-    title: category.name
-  })
+    navigation.navigate("SelectItems", {
+        category: category,
+        title: category.name
+    });
+    ampInstance.logEvent('CATEGORY_CLICKED')
+    ampInstance.trackingSessionEvents(true);
 }
 
   return (
@@ -389,8 +396,6 @@ const categorySelected = (category) => {
           
           <TouchableOpacity style={styles.categoryView} key={category.name} onPress={() => {
             categorySelected(category);
-            ampInstance.logEvent('CATEGORY_CLICKED')
-            ampInstance.trackingSessionEvents(true);
             }}> 
           <View style={{
     flexDirection: "column", alignItems:"center", flex:1}}>
@@ -426,8 +431,6 @@ const categorySelected = (category) => {
           
           <TouchableOpacity style={styles.orderView} key={order.id} onPress={() => {
             orderPressed(order);
-            ampInstance.logEvent('ORDERS_CLICKED');
-            ampInstance.trackingSessionEvents(true);
             }}> 
           <View>
            <Text style={[styles.bodyText, {textAlign: "left", marginBottom: 5}]}>
@@ -474,7 +477,6 @@ const categorySelected = (category) => {
          
             <TouchableOpacity style={styles.itemView} onPress={() => { 
                 itemClicked(item);
-                ampInstance.logEvent('ITEM_CLICKED')
                 }}>
                <Image style={styles.itemImage} source={{uri: item.image ? item.image : "https://via.placeholder.com/150"}}/>
               <View style={{width:"100%"}}>
