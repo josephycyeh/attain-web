@@ -3,40 +3,19 @@ import {
   StyleSheet,
   View,
   SafeAreaView,
-  ScrollView,
   FlatList,
-  StatusBar,
-  TextInput,
   TouchableOpacity,
   Image,
-  Alert,
-  Platform,
   Dimensions,
   PixelRatio
 } from "react-native";
 import Text from '../../components/Text'
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-import algoliasearch from "algoliasearch";
-import { InstantSearch, connectStateResults } from "react-instantsearch-native";
-import SearchBox from "../../components/SearchBox";
-import InfiniteHits from "../../components/InfiniteHits";
 import {
-  useGetItemsQuery,
-  useGetOrdersQuery,
-  useGetCartsQuery,
-  useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
   useGetCategoriesQuery,
 } from "../../generated/graphql";
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
-
-
-import { UserContext } from "../../context/userContext";
-import { getAuth, signOut } from "firebase/auth";
-
-
+import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 
 
 
@@ -62,16 +41,8 @@ const fontScalerCalculator = (scaler) => {
   return 1
 }
 const fontScaler = fontScalerCalculator(fontScale)
-console.log(fontScale)
-console.log(fontScaler)
-const searchClient = algoliasearch(
-  "latency",
-  "6be0576ff61c053d5f9a3225e2a90f76"
-);
 
-const Results = connectStateResults(({ searchState, children }) =>
-  searchState && searchState.query ? children : null
-);
+
 const styles = StyleSheet.create({
   homeContainer: {
     flex: 1,
@@ -232,17 +203,6 @@ const styles = StyleSheet.create({
 
 
 function BrowseScreenComponent({ navigation, route }) {
-  const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
-  const [selectedTag, setSelectedTag] = useState(null);
-
-
-
-  const auth = getAuth();
-
-
-
-
-
   const {
     loading: getCategoriesLoading,
     error: getCategoriesError,
@@ -341,6 +301,12 @@ export default function BrowseScreen() {
         component={SelectItemsScreen}
         options={({ route }) => ({ title: route.params.title })}
       />
+      <BrowseStack.Screen
+        name="ItemDetail"
+        component={ItemDetailScreen}
+        options={{ title: "Item Details" }}
+      />
+      
      
     </BrowseStack.Navigator>
   );

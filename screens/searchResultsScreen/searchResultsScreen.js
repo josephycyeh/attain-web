@@ -3,24 +3,9 @@ import {
   StyleSheet,
   View,
   SafeAreaView,
-  ScrollView,
   StatusBar,
-  Button,
-  TouchableOpacity,
-  Image,
 } from "react-native";
 import Text from "../../components/Text"
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
-import { BarCodeScanner } from "expo-barcode-scanner";
-import NumericInput from "react-native-numeric-input";
-import {
-  useGetItemsQuery,
-  useGetCartsQuery,
-  useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
-} from "../../generated/graphql";
 import algoliasearch from "algoliasearch";
 import { InstantSearch, connectStateResults } from "react-instantsearch-native";
 import SearchBox from "../../components/SearchBox";

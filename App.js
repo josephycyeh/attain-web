@@ -1,16 +1,10 @@
 import react, { useState, useEffect, createContext } from "react";
 import { Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-import HomeScreen from "./screens/homeScreen/homeScreen";
-import ScannerScreen from "./screens/scannerScreen/scannerScreen";
-import CartScreen from "./screens/cartScreen/cartScreen.js";
 import HomeTabs from "./screens/homeTabs/homeTabs.js";
 import LoginScreen from "./screens/login/loginScreen.js";
 import OrderSubmittedScreen from "./screens/orderSubmittedScreen/orderSubmittedScreen.js";
-import ItemDetailScreen from "./screens/itemDetailScreen/itemDetailScreen";
-import { AppRegistry } from "react-native";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 
 import { ApolloProvider } from "@apollo/react-hooks";
@@ -22,18 +16,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
-  collection,
-  getDocs,
   doc,
   getDoc,
 } from "firebase/firestore";
 
 import {
-  useGetItemsQuery,
-  useGetOrdersQuery,
   useGetCartsQuery,
-  useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
   useGetUsersQuery,
 } from "./generated/graphql";
 import { enableScreens } from 'react-native-screens';
@@ -97,8 +85,7 @@ function AppComponent() {
       getUsersInput: {
         ids: [userId],
       },
-    },
-    pollInterval: 2000,
+    }
   });
 
   const {
@@ -110,7 +97,7 @@ function AppComponent() {
     skip: userId == null,
     variables: {
       getCartsInput: {
-        userId: user.id,
+        userId: userId,
       },
     },
     pollInterval: 500,
@@ -134,13 +121,10 @@ function AppComponent() {
   }, []);
 
   useEffect(() => {
-
-    if (!getUsersLoading && getUsersData) {
-      setUser(getUsersData.users[0]);
-    }
-    if (!getCartsLoading && getCartsData) {
+    // console.log({"getUsersLoading": getUsersLoading, "getUsersData":getUsersData, "getCartsLoading":getCartsLoading, "getCartsData":getCartsData } )
+    if (!getUsersLoading && getUsersData && !getCartsLoading && getCartsData) {
       console.log("cart changed 1")
-      setUser({...user, cart: getCartsData.carts[0]})
+      setUser({...getUsersData.users[0], cart: getCartsData.carts[0]})
     }
     
   }, [getUsersLoading, getUsersData, getCartsData, getCartsLoading]);
@@ -151,6 +135,7 @@ function AppComponent() {
 
 
 
+  
   if (getUsersLoading && !getUsersData) return <Text>Loading</Text>;
   if (getUsersError) return <Text>Error: {getUsersError.message}</Text>;
 

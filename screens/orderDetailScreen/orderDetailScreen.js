@@ -139,21 +139,7 @@ const styles = StyleSheet.create({
 export default function OrderDetailScreen({ navigation, route }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const { upcCode, orderId } = route.params;
-  console.log(upcCode);
-  const {
-    loading: getCartsLoading,
-    data: getCartsData,
-    error: getCartsError,
-  } = useGetCartsQuery({
-    fetchPolicy: "network-only",
-    variables: {
-      getCartsInput: {
-        ids: ["1"],
-      },
-    },
-    pollInterval: 500,
-  });
-  console.log(orderId);
+
   const {
     loading: getOrdersLoading,
     data: getOrdersData,
@@ -165,8 +151,7 @@ export default function OrderDetailScreen({ navigation, route }) {
         userId: user.id,
         ids: [orderId],
       },
-    },
-    pollInterval: 500,
+    }
   });
 
   if (getOrdersLoading && !getOrdersData) return <Text>Loading</Text>;

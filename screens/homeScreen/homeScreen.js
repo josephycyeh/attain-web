@@ -7,22 +7,15 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  Alert,
-  Platform,
   Dimensions,
   PixelRatio
 } from "react-native";
-import Modal from "react-native-modal";
 
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
-import algoliasearch from "algoliasearch";
 import {
   useGetItemsQuery,
   useGetOrdersQuery,
-  useGetCartsQuery,
-  useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
   useGetCategoriesQuery,
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
@@ -242,19 +235,6 @@ function HomeComponent({ navigation }) {
     pollInterval: 3000,
   });
 
-  const {
-    loading: getCartsLoading,
-    data: getCartsData,
-    error: getCartsError,
-  } = useGetCartsQuery({
-    fetchPolicy: "network-only",
-    variables: {
-      getCartsInput: {
-        userId: user.id,
-      },
-    },
-    pollInterval: 500,
-  });
 
   const {
     loading: getItemsLoading,
@@ -289,17 +269,6 @@ function HomeComponent({ navigation }) {
     },
   });
 
-  const [
-    updateItemInCart,
-    {
-      loading: updateItemInCartLoading,
-      data: updateItemInCartData,
-      error: updateItemInCartError,
-    },
-  ] = useUpdateItemInCartMutation();
-
-  if (getCartsLoading && !getCartsData) return <Text>Loading</Text>;
-  if (getCartsError) return <Text>{getCartsError.message}</Text>;
 
   if (getOrdersLoading && !getOrdersData) return <Text>Loading</Text>;
   if (getOrdersError) return <Text>{getOrdersError.message}</Text>;
@@ -309,11 +278,6 @@ function HomeComponent({ navigation }) {
 
   if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
-  const itemClicked = (item) => {
-    navigation.navigate("ItemDetail", {
-      id: item.id,
-    });
-  };
 
   const orderPressed = (order) => {
     navigation.navigate("OrderDetail", {
@@ -332,25 +296,6 @@ function HomeComponent({ navigation }) {
   };
 
 
-  const cart = getCartsData.carts[0];
-  const addItemToCart = (item) => {
-    var quantityToBeUpdated = 1;
-    const checkItemId = (cartItem) => cartItem.item_id == item.id;
-    if (cart.cartItems.some(checkItemId)) {
-      quantityToBeUpdated += cart.cartItems.find(
-        (cartItem) => cartItem.item_id == item.id
-      ).quantity;
-    }
-    updateItemInCart({
-      variables: {
-        updateItemInCartInput: {
-          cartId: cart.id,
-          itemId: item.id,
-          quantity: quantityToBeUpdated,
-        },
-      },
-    });
-  };
 
   const categorySelected = (category) => {
     navigation.navigate("SelectItems", {

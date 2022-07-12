@@ -15,20 +15,10 @@ import {
   PixelRatio
 } from "react-native";
 import Text from "../../components/Text"
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import algoliasearch from "algoliasearch";
-import { InstantSearch, connectStateResults } from "react-instantsearch-native";
-import SearchBox from "../../components/SearchBox";
-import InfiniteHits from "../../components/InfiniteHits";
 import {
-  useGetItemsQuery,
   useGetOrdersQuery,
-  useGetCartsQuery,
-  useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
-  useGetCategoriesQuery,
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
@@ -36,9 +26,6 @@ import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
 import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
-import { Ionicons } from "@expo/vector-icons";
-
-import axios from "axios";
 
 import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
@@ -68,16 +55,7 @@ const fontMultiplier = (scaler) => {
   return 1
 }
 const fontScaler = (fontScale * fontMultiplier(fontScale))
-console.log(fontScale)
-console.log(fontScaler)
-const searchClient = algoliasearch(
-  "latency",
-  "6be0576ff61c053d5f9a3225e2a90f76"
-);
 
-const Results = connectStateResults(({ searchState, children }) =>
-  searchState && searchState.query ? children : null
-);
 
 const styles = StyleSheet.create({
   homeContainer: {
