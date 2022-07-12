@@ -13,7 +13,9 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Amplitude } from '@amplitude/react-native';
+// import { Amplitude } from '@amplitude/react-native';
+// import amplitude from 'amplitude-js';
+// import * as Amplitude from 'expo-analytics-amplitude';
 import { BarCodeScanner } from "expo-barcode-scanner";
 import {
   useGetCartsQuery,
@@ -22,8 +24,8 @@ import {
 import { UserContext } from "../../context/userContext";
 import { format, add } from "date-fns";
 
-const ampInstance = Amplitude.getInstance();
-ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+// const ampInstance = amplitude.getInstance();
+// ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
 
 const styles = StyleSheet.create({
   container: {

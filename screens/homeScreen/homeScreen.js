@@ -21,7 +21,10 @@ import {
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
-import { Amplitude } from '@amplitude/react-native';
+// import { Amplitude } from '@amplitude/react-native';
+// import amplitude from 'amplitude-js';
+import * as Amplitude from 'expo-analytics-amplitude';
+
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
 import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
@@ -35,8 +38,10 @@ import ItemCard from "../../components/ItemCard"
 const screenWidth = Dimensions.get('window').width;
 const fontScale = PixelRatio.getFontScale()
 
-const ampInstance = Amplitude.getInstance();
-ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+// const ampInstance = Amplitude.getInstance();
+// ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
+
 
 const fontScalerCalculator = (scaler) => {
 
@@ -284,8 +289,9 @@ function HomeComponent({ navigation }) {
     navigation.navigate("OrderDetail", {
       orderId: order.id,
     });
-    ampInstance.logEvent('ORDER_CLICKED');
-    ampInstance.trackingSessionEvents(true);
+    // ampInstance.logEvent('ORDER_CLICKED');
+    Amplitude.logEventAsync('ORDER_CLICKED')
+    // ampInstance.trackingSessionEvents(true);
   };
 
   const logoutButtonPressed = async () => {
@@ -294,7 +300,8 @@ function HomeComponent({ navigation }) {
 
   const searchBarPressed = () => {
     navigation.navigate("SearchResults");
-    ampInstance.logEvent('SEARCH_CLICKED');
+    // ampInstance.logEvent('SEARCH_CLICKED');
+    Amplitude.logEventAsync('SEARCH_CLICKED')
   };
 
 
@@ -304,7 +311,8 @@ function HomeComponent({ navigation }) {
       category: category,
       title: category.name,
     });
-    ampInstance.logEvent('CATEGORY_CLICKED')
+    // ampInstance.logEvent('CATEGORY_CLICKED')
+    Amplitude.logEventAsync('CATEGORY_CLICKED')
   };
 
   const renderItem = ({ item }) => (
