@@ -2,7 +2,8 @@ import react, { useState, useEffect, createContext } from "react";
 import { Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Amplitude } from '@amplitude/react-native';
+// import { Amplitude } from '@amplitude/react-native';
+import * as Amplitude from 'expo-analytics-amplitude';
 import HomeScreen from "./screens/homeScreen/homeScreen";
 import ScannerScreen from "./screens/scannerScreen/scannerScreen";
 import CartScreen from "./screens/cartScreen/cartScreen.js";
@@ -65,8 +66,9 @@ const client = new ApolloClient({
   cache: new InMemoryCache({ addTypename: false }),
 });
 
-const ampInstance = Amplitude.getInstance();
-ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+// const ampInstance = Amplitude.getInstance();
+// ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
 
 export default function App() {
   return (
@@ -112,13 +114,14 @@ function AppComponent() {
 
 
   useEffect(async () => {
-    ampInstance.trackingSessionEvents(true);
+    // ampInstance.trackingSessionEvents(true);
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const querySnapshot = await getDoc(doc(db, "users", user.uid));
 
         setUserId(querySnapshot.data()["userId"]);
-        ampInstance.setUserId(querySnapshot.data()["userId"])
+        // ampInstance.setUserId(querySnapshot.data()["userId"])
+        Amplitude.setUserIdAsync(querySnapshot.data()["userId"])
 
         setIsLoggedIn(true);
       } else {

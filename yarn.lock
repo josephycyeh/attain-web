@@ -118,11 +118,6 @@
   dependencies:
     "@amplitude/ua-parser-js" "0.7.31"
 
-"@amplitude/react-native@^2.12.1":
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/@amplitude/react-native/-/react-native-2.12.1.tgz#88798269d29386a6e5694ac5da262b22d104bfbd"
-  integrity sha512-J+EMC2X2U5DZaY8XyiXk4nDDaNxBihd33ZPU2oRzXdVp/25JSuyBtX3I5mllgvCWzF5tVzMacd7uNZAcsWNW4g==
-
 "@amplitude/types@^1.10.0":
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/@amplitude/types/-/types-1.10.0.tgz#dfaf7cc25f533a1e2b0ef0ad675371b396733c0f"
