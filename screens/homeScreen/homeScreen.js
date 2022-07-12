@@ -13,11 +13,8 @@ import {
 
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
-<<<<<<< HEAD
 import { Amplitude } from '@amplitude/react-native';
 import algoliasearch from "algoliasearch";
-=======
->>>>>>> c3e944eab008fd77cf19336df08dee922336cb31
 import {
   useGetItemsQuery,
   useGetOrdersQuery,
