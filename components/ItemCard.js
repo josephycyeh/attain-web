@@ -11,10 +11,7 @@ import Text from './Text.js'
 import Highlight from "./Highlight";
 import AddItemModal from "./AddItemModal";
 import { UserContext } from "../context/userContext";
-
-
-
-
+import { Amplitude } from '@amplitude/react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 
@@ -151,9 +148,13 @@ const styles = StyleSheet.create({
   })
 
 
-const ItemCard = ({item, highlighted}) => {
+  const ampInstance = Amplitude.getInstance();
+  ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+
+const ItemCard = ({item, highlighted, screenName}) => {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const [modalVisible, setModalVisible] = useState(false);
+
 
   const cart = user.cart;
   const addItemToCart = (item) => {
@@ -176,6 +177,7 @@ const itemClicked = (item) => {
     navigation.navigate("ItemDetail", {
       id: item.id,
     });
+    ampInstance.logEvent('ITEM_CLICKED', {screen: screenName, itemId: item.id});
   };
 
   return (

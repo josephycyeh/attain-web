@@ -38,7 +38,7 @@ const InfiniteHits = ({ hits, hasMore, refineNext, goToItemDetail }) => {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         onEndReached={() => hasMore && refineNext()}
         renderItem={({ item }) => (
-         <ItemCard item={item} highlighted/>
+         <ItemCard item={item} highlighted screenName="search"/>
         )}
       />
     </View>

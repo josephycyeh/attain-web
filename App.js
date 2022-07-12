@@ -65,6 +65,9 @@ const client = new ApolloClient({
   cache: new InMemoryCache({ addTypename: false }),
 });
 
+const ampInstance = Amplitude.getInstance();
+ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+
 export default function App() {
   return (
     <ApolloProvider client={client}>
@@ -108,16 +111,14 @@ function AppComponent() {
   });
 
 
-
   useEffect(async () => {
+    ampInstance.trackingSessionEvents(true);
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const querySnapshot = await getDoc(doc(db, "users", user.uid));
 
         setUserId(querySnapshot.data()["userId"]);
-        const ampInstance = Amplitude.getInstance();
-        ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
-        ampInstance.trackingSessionEvents(true);
+        ampInstance.setUserId(querySnapshot.data()["userId"])
 
         setIsLoggedIn(true);
       } else {

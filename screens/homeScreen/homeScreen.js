@@ -13,7 +13,6 @@ import {
 
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
-import { Amplitude } from '@amplitude/react-native';
 import algoliasearch from "algoliasearch";
 import {
   useGetItemsQuery,
@@ -22,7 +21,7 @@ import {
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
-
+import { Amplitude } from '@amplitude/react-native';
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
 import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
@@ -33,11 +32,11 @@ import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
 import ItemCard from "../../components/ItemCard"
 
-const ampInstance = Amplitude.getInstance();
-ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
-
 const screenWidth = Dimensions.get('window').width;
 const fontScale = PixelRatio.getFontScale()
+
+const ampInstance = Amplitude.getInstance();
+ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
 
 const fontScalerCalculator = (scaler) => {
 
@@ -279,15 +278,7 @@ function HomeComponent({ navigation }) {
 
   if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
-<<<<<<< HEAD
-  const itemClicked = (item) => {
-    navigation.navigate("ItemDetail", {
-      id: item.id,
-    });
-    ampInstance.logEvent('ITEM_CLICKED');
-  };
-=======
->>>>>>> c3e944eab008fd77cf19336df08dee922336cb31
+
 
   const orderPressed = (order) => {
     navigation.navigate("OrderDetail", {
@@ -304,7 +295,6 @@ function HomeComponent({ navigation }) {
   const searchBarPressed = () => {
     navigation.navigate("SearchResults");
     ampInstance.logEvent('SEARCH_CLICKED');
-    ampInstance.trackingSessionEvents(true);
   };
 
 
@@ -315,11 +305,10 @@ function HomeComponent({ navigation }) {
       title: category.name,
     });
     ampInstance.logEvent('CATEGORY_CLICKED')
-    ampInstance.trackingSessionEvents(true);
   };
 
   const renderItem = ({ item }) => (
-    <ItemCard item={item}/>
+    <ItemCard item={item} screenName="home"/>
   )
   
   return (

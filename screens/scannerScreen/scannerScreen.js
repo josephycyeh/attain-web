@@ -98,6 +98,7 @@ function ScannerScreenComponent({ navigation }) {
   const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
+    ampInstance.logEvent('SCANNING_CLICKED');
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
@@ -111,9 +112,8 @@ function ScannerScreenComponent({ navigation }) {
     return unsubscribe;
   }, [navigation]);
   const handleBarCodeScanned = ({ type, data }) => {
-    console.log(data)
+    ampInstance.logEvent('SCANNED_ITEM');
     setScanned(true);
-    ampInstance.logEvent('SCANNING_CLICKED');
     navigation.navigate("ItemDetail", {
       upcCode: data,
     });
