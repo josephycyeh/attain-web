@@ -12,22 +12,9 @@ import {
   Platform,
   TextInput,
 } from "react-native";
+
 import Text from "../../components/Text"
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
-import { BarCodeScanner } from "expo-barcode-scanner";
-import NumericInput from "react-native-numeric-input";
-import {
-  useGetItemsQuery,
-  useGetCartsQuery,
-  useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
-} from "../../generated/graphql";
-import algoliasearch from "algoliasearch";
-import { InstantSearch, connectStateResults } from "react-instantsearch-native";
-import SearchBox from "../../components/SearchBox";
-import InfiniteHits from "../../components/InfiniteHits";
+
 
 import { UserContext } from "../../context/userContext";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -134,15 +121,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-const searchClient = algoliasearch(
-  "65VCJQ2Y52",
-  "d6602e5f7c45ce8b0ef699efe84cca0d"
-);
 
-const Results = connectStateResults(({ searchState, children }) => {
-  console.log(searchState.query);
-  return searchState && searchState.query ? children : null;
-});
 
 export default function LoginScreen({ navigation, route }) {
   const { isLoggedIn, setIsLoggedIn } = useContext(UserContext);

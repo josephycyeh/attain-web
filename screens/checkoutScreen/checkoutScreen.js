@@ -175,22 +175,7 @@ export default function CheckoutScreen({ navigation, route }) {
     },
   ] = useSubmitOrderMutation();
 
-  const { cartId } = route.params;
-  const {
-    loading: getCartsLoading,
-    data: getCartsData,
-    error: getCartsError,
-  } = useGetCartsQuery({
-    fetchPolicy: "network-only",
-    variables: {
-      getCartsInput: {
-        userId: user.id,
-      },
-    },
-  });
-  const onBackToScanPressed = () => {
-    navigation.goBack();
-  };
+
   const submitOrderClicked = () => {
     try {
       console.log(user.id);
@@ -207,10 +192,8 @@ export default function CheckoutScreen({ navigation, route }) {
     navigation.navigate("OrderSubmittedScreen");
   };
 
-  if (getCartsLoading && !getCartsData) return <Text>Loading</Text>;
-  if (getCartsError) return <Text>Error</Text>;
 
-  const cart = getCartsData.carts[0];
+  const cart = user.cart
   return (
     <SafeAreaView style={styles.container}>
       <View

@@ -13,30 +13,13 @@ import {
   Platform,
 } from "react-native";
 import Text from "../../components/Text"
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
-import algoliasearch from "algoliasearch";
-import { InstantSearch, connectStateResults } from "react-instantsearch-native";
-import SearchBox from "../../components/SearchBox";
-import InfiniteHits from "../../components/InfiniteHits";
 import {
-  useGetItemsQuery,
-  useGetOrdersQuery,
-  useGetCartsQuery,
   useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
   useGetItemsByFilterQuery,
   useGetTagsQuery,
 } from "../../generated/graphql";
-import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
-import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
 import ItemCard from '../../components/ItemCard'
-import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
 
-import { Ionicons } from "@expo/vector-icons";
-
-import axios from "axios";
 
 import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
@@ -202,36 +185,6 @@ export default function SelectItemsScreen({ navigation, route }) {
 
   const { category } = route.params;
 
-  const auth = getAuth();
-
-  const {
-    loading: getOrdersLoading,
-    data: getOrdersData,
-    error: getOrdersError,
-  } = useGetOrdersQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      getOrdersInput: {
-        userId: user.id,
-      },
-    },
-    pollInterval: 500,
-  });
-
-  const {
-    loading: getCartsLoading,
-    data: getCartsData,
-    error: getCartsError,
-  } = useGetCartsQuery({
-    fetchPolicy: "cache-and-network",
-    variables: {
-      getCartsInput: {
-        userId: user.id,
-      },
-    },
-    pollInterval: 500,
-  });
-
   const {
     loading: getItemsLoading,
     error: getItemsError,
@@ -268,20 +221,6 @@ export default function SelectItemsScreen({ navigation, route }) {
     },
   });
 
-  const [
-    updateItemInCart,
-    {
-      loading: updateItemInCartLoading,
-      data: updateItemInCartData,
-      error: updateItemInCartError,
-    },
-  ] = useUpdateItemInCartMutation();
-
-  if (getCartsLoading && !getCartsData) return <Text>Loading</Text>;
-  if (getCartsError) return <Text>{getCartsError.message}</Text>;
-
-  if (getOrdersLoading && !getOrdersData) return <Text>Loading</Text>;
-  if (getOrdersError) return <Text>{getOrdersError.message}</Text>;
 
   if (getItemsLoading && !getItemsData) return <Text>Loading</Text>;
   if (getItemsError) return <Text>{getItemsError.message}</Text>;
@@ -289,66 +228,9 @@ export default function SelectItemsScreen({ navigation, route }) {
   if (getTagsLoading && !getTagsData) return <Text>Loading</Text>;
   if (getTagsError) return <Text>{getTagsError.message}</Text>;
 
-  const itemClicked = (item) => {
-    navigation.navigate("ItemDetail", {
-      upc: item.upc1
-    });
-  };
 
-  const orderPressed = (order) => {
-    navigation.navigate("OrderDetail", {
-      orderId: order.id,
-    });
-  };
 
-  const logoutButtonPressed = async () => {
-    await signOut(auth);
-  };
-
-  const searchBarPressed = () => {
-    navigation.navigate("SearchResults");
-  };
-
-  const fetchMoreItems = () => {
-    fetchMoreItemsQuery({
-      variables: {
-        getItemsByFilterInput: {
-          category: category.value,
-          tag: selectedTag ? selectedTag.value : null,
-          pagination: {
-            offset: getItemsData.items.length + 1,
-          },
-        },
-      },
-    });
-  };
-
-  const cart = getCartsData.carts[0];
-  const addItemToCart = (item) => {
-    var quantityToBeUpdated = 1;
-    const checkItemId = (cartItem) => cartItem.item_id == item.id;
-    if (cart.cartItems.some(checkItemId)) {
-      quantityToBeUpdated += cart.cartItems.find(
-        (cartItem) => cartItem.item_id == item.id
-      ).quantity;
-    }
-    updateItemInCart({
-      variables: {
-        updateItemInCartInput: {
-          cartId: cart.id,
-          itemId: item.id,
-          quantity: quantityToBeUpdated,
-        },
-      },
-    });
-  };
-
-  const categorySelected = (category) => {
-    navigation.navigate("SelectItems", {
-      category: category,
-      title: category.name,
-    });
-  };
+  const cart = cart
 
   const onSelectTag = (tag, index) => {
     if (selectedTag && index === selectedTag.index) {

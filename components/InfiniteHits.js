@@ -3,12 +3,10 @@ import {
   StyleSheet,
   View,
   FlatList,
-  TouchableOpacity,
 } from "react-native";
 import Text from "./Text.js"
 import PropTypes from "prop-types";
 import { connectInfiniteHits } from "react-instantsearch-native";
-import Highlight from "./Highlight";
 import ItemCard from "./ItemCard"
 const styles = StyleSheet.create({
   separator: {

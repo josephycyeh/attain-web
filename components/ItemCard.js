@@ -2,28 +2,14 @@ import react, { useEffect, useState, useContext } from "react";
 import {
     StyleSheet,
     View,
-    SafeAreaView,
-    ScrollView,
-    FlatList,
     TouchableOpacity,
     Image,
     Alert,
-    Platform,
-    Dimensions,
-    PixelRatio,
   } from "react-native";
   import Modal from "react-native-modal";
 import Text from './Text.js'
 import Highlight from "./Highlight";
 import AddItemModal from "./AddItemModal";
-import {
-  useGetItemsQuery,
-  useGetOrdersQuery,
-  useGetCartsQuery,
-  useUpdateItemInCartMutation,
-  useAddItemToCartMutation,
-  useGetCategoriesQuery,
-} from "../generated/graphql";
 import { UserContext } from "../context/userContext";
 
 

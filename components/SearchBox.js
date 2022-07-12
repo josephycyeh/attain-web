@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
 const SearchBox = ({ currentRefinement, refine }) => (
   <View style={styles.container}>
     <TextInput
+      autoFocus
       style={styles.input}
       onChangeText={(value) => refine(value)}
       value={currentRefinement}
