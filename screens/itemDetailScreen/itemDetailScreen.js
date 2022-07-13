@@ -97,7 +97,7 @@ export default function ItemDetailScreen({ navigation, route }) {
   const { id, upcCode } = route.params;
 
   const { loading, error, data } = useGetItemsQuery({
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     variables: {
       getItemsInput: {
         ids: id ? [id] : null,

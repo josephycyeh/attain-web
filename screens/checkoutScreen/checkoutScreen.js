@@ -21,9 +21,6 @@ import {
 import { UserContext } from "../../context/userContext";
 import { format, add } from "date-fns";
 
-// const ampInstance = amplitude.getInstance();
-// ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -175,13 +172,15 @@ export default function CheckoutScreen({ navigation, route }) {
   ] = useSubmitOrderMutation();
 
 
+
+
+  const cart = user.cart
   const submitOrderClicked = () => {
     try {
-      console.log(user.id);
       submitOrder({
         variables: {
           submitOrderInput: {
-            cartId: cartId,
+            cartId: cart.id,
             userId: user.id,
           },
         },
@@ -190,9 +189,6 @@ export default function CheckoutScreen({ navigation, route }) {
 
     navigation.navigate("OrderSubmittedScreen");
   };
-
-
-  const cart = user.cart
   return (
     <SafeAreaView style={styles.container}>
       <View

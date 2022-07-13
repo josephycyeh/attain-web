@@ -106,7 +106,6 @@ const Results = connectStateResults(({ searchState, children }) => {
 
 export default function SearchResultsScreen({ navigation, route }) {
   const goToItemDetail = (item) => {
-    console.log(item.id);
     navigation.navigate("ItemDetail", {
       id: item.id,
     });
