@@ -172,9 +172,8 @@ export default function CheckoutScreen({ navigation, route }) {
   ] = useSubmitOrderMutation();
 
 
-
-
   const cart = user.cart
+
   const submitOrderClicked = () => {
     try {
       submitOrder({
@@ -189,6 +188,8 @@ export default function CheckoutScreen({ navigation, route }) {
 
     navigation.navigate("OrderSubmittedScreen");
   };
+
+
   return (
     <SafeAreaView style={styles.container}>
       <View
