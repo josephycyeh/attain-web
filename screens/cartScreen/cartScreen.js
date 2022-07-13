@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
 function CartScreenComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const { loading, data, error } = useGetCartsQuery({
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     variables: {
       getCartsInput: {
         userId: user.id,

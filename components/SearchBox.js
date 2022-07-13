@@ -22,8 +22,6 @@ const fontScalerCalculator = (scaler) => {
   return 1
 }
 const fontScaler = fontScalerCalculator(fontScale)
-console.log(fontScale)
-console.log(fontScaler)
 const styles = StyleSheet.create({
   container: {
     padding: 16,

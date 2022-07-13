@@ -145,7 +145,7 @@ export default function OrderDetailScreen({ navigation, route }) {
     data: getOrdersData,
     error: getOrdersError,
   } = useGetOrdersQuery({
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     variables: {
       getOrdersInput: {
         userId: user.id,

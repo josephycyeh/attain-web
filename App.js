@@ -67,9 +67,10 @@ const client = new ApolloClient({
 
 // const ampInstance = Amplitude.getInstance();
 // ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
-Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
+
 
 export default function App() {
+  
   return (
     <ApolloProvider client={client}>
       <AppComponent></AppComponent>
@@ -101,7 +102,7 @@ function AppComponent() {
     data: getCartsData,
     error: getCartsError,
   } = useGetCartsQuery({
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     skip: userId == null,
     variables: {
       getCartsInput: {
@@ -113,14 +114,13 @@ function AppComponent() {
 
 
   useEffect(async () => {
-    // ampInstance.trackingSessionEvents(true);
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const querySnapshot = await getDoc(doc(db, "users", user.uid));
-
+        await Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
+        await Amplitude.setUserIdAsync(querySnapshot.data()["userId"])
+        await Amplitude.logEventAsync("USER_OPENED_APP")
         setUserId(querySnapshot.data()["userId"]);
-        // ampInstance.setUserId(querySnapshot.data()["userId"])
-        Amplitude.setUserIdAsync(querySnapshot.data()["userId"])
 
         setIsLoggedIn(true);
       } else {
@@ -131,9 +131,7 @@ function AppComponent() {
   }, []);
 
   useEffect(() => {
-    // console.log({"getUsersLoading": getUsersLoading, "getUsersData":getUsersData, "getCartsLoading":getCartsLoading, "getCartsData":getCartsData } )
     if (!getUsersLoading && getUsersData && !getCartsLoading && getCartsData) {
-      console.log("cart changed 1")
       setUser({...getUsersData.users[0], cart: getCartsData.carts[0]})
     }
     

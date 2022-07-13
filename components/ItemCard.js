@@ -11,13 +11,9 @@ import Text from './Text.js'
 import Highlight from "./Highlight";
 import AddItemModal from "./AddItemModal";
 import { UserContext } from "../context/userContext";
-import * as Amplitude from 'expo-analytics-amplitude';
-
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
-
-Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
-
+import * as Amplitude from 'expo-analytics-amplitude';
 const styles = StyleSheet.create({
     homeContainer: {
       flex: 1,
@@ -172,12 +168,12 @@ const getItemQuantityInCart = () => {
 }
 
 
-const itemClicked = (item) => {
+const itemClicked = async (item) => {
     navigation.navigate("ItemDetail", {
       id: item.id,
     });
     // ampInstance.logEvent('ITEM_CLICKED', {screen: screenName, itemId: item.id});
-    Amplitude.logEventWithPropertiesAsync('ITEM_CLICKED', {screen: screenName, itemId: item.id});
+    await Amplitude.logEventWithPropertiesAsync('ITEM_CLICKED', {screen: screenName, itemId: item.id});
   };
 
   return (

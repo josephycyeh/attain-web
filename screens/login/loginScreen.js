@@ -138,7 +138,6 @@ export default function LoginScreen({ navigation, route }) {
   const [loginError, setLoginError] = useState(null);
   const signInButtonPressed = async () => {
     const email = credentials.username + "@joinattain.com";
-    console.log(email);
     const password = credentials.password;
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {

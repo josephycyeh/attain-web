@@ -10,10 +10,8 @@ import {
   Dimensions,
   PixelRatio
 } from "react-native";
-
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
-import algoliasearch from "algoliasearch";
 import {
   useGetItemsQuery,
   useGetOrdersQuery,
@@ -21,24 +19,16 @@ import {
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
-import * as Amplitude from 'expo-analytics-amplitude';
-
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
 import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
-
 import { Ionicons } from "@expo/vector-icons";
-
-
+import * as Amplitude from 'expo-analytics-amplitude';
 import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
 import ItemCard from "../../components/ItemCard"
 
 const screenWidth = Dimensions.get('window').width;
 const fontScale = PixelRatio.getFontScale()
-
-// const ampInstance = Amplitude.getInstance();
-// ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
-Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
 
 
 const fontScalerCalculator = (scaler) => {
@@ -58,9 +48,6 @@ const fontScalerCalculator = (scaler) => {
   return 1
 }
 const fontScaler = fontScalerCalculator(fontScale)
-console.log(fontScale)
-console.log(fontScaler)
-
 
 
 const styles = StyleSheet.create({
@@ -221,9 +208,7 @@ const styles = StyleSheet.create({
 
 function HomeComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
-
   const auth = getAuth();
-
   const {
     loading: getOrdersLoading,
     data: getOrdersData,
@@ -283,34 +268,31 @@ function HomeComponent({ navigation }) {
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
 
 
-  const orderPressed = (order) => {
+  const orderPressed = async (order) => {
     navigation.navigate("OrderDetail", {
       orderId: order.id,
     });
-    // ampInstance.logEvent('ORDER_CLICKED');
-    Amplitude.logEventAsync('ORDER_CLICKED')
-    // ampInstance.trackingSessionEvents(true);
+    await Amplitude.logEventAsync('ORDER_CLICKED')
   };
 
   const logoutButtonPressed = async () => {
     await signOut(auth);
   };
 
-  const searchBarPressed = () => {
+  const searchBarPressed = async () => {
     navigation.navigate("SearchResults");
-    // ampInstance.logEvent('SEARCH_CLICKED');
-    Amplitude.logEventAsync('SEARCH_CLICKED')
+      await Amplitude.logEventAsync('SEARCH_CLICKED')
+    
   };
 
 
 
-  const categorySelected = (category) => {
+  const categorySelected = async (category) => {
     navigation.navigate("SelectItems", {
       category: category,
       title: category.name,
     });
-    // ampInstance.logEvent('CATEGORY_CLICKED')
-    Amplitude.logEventAsync('CATEGORY_CLICKED')
+    await Amplitude.logEventAsync('CATEGORY_CLICKED')
   };
 
   const renderItem = ({ item }) => (
@@ -523,7 +505,6 @@ function HomeComponent({ navigation }) {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           onEndReached={() => {
-            console.log(getItemsData.items.length);
             fetchMoreItemsQuery({
               variables: {
                 getItemsInput: {

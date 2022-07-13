@@ -232,7 +232,6 @@ function BrowseScreenComponent({ navigation, route }) {
   if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
 
-  console.log(getCategoriesData.categories)
   return (
     <SafeAreaView style={{backgroundColor:'white'}}>
       <View style={styles.container}>

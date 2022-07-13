@@ -13,14 +13,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Amplitude from 'expo-analytics-amplitude';
-
 import { BarCodeScanner } from "expo-barcode-scanner";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 const opacity = "rgba(0, 0, 0, .6)";
-
-// const ampInstance = Amplitude.getInstance();
-// ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
-Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
 
 const fontScale = PixelRatio.getFontScale()
 
@@ -99,9 +94,9 @@ function ScannerScreenComponent({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
 
-  useEffect(() => {
-    // ampInstance.logEvent('SCANNING_CLICKED');
-    Amplitude.logEventAsync('SCANNING_CLICKED');
+  useEffect(async () => {
+    
+    await Amplitude.logEventAsync('SCANNING_SCREEN_VIEWED');
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
@@ -114,9 +109,8 @@ function ScannerScreenComponent({ navigation }) {
 
     return unsubscribe;
   }, [navigation]);
-  const handleBarCodeScanned = ({ type, data }) => {
-    // ampInstance.logEvent('SCANNED_ITEM');
-    Amplitude.logEventAsync('SCANNED_ITEM');
+  const handleBarCodeScanned = async ({ type, data }) => {
+    await Amplitude.logEventAsync('SCANNED_ITEM');
     setScanned(true);
     navigation.navigate("ItemDetail", {
       upcCode: data,
