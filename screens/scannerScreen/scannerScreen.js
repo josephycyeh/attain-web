@@ -12,8 +12,6 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-// import { Amplitude } from '@amplitude/react-native';
-// import amplitude from 'amplitude-js';
 import * as Amplitude from 'expo-analytics-amplitude';
 
 import { BarCodeScanner } from "expo-barcode-scanner";

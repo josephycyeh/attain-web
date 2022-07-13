@@ -2,7 +2,6 @@ import react, { useState, useEffect, createContext } from "react";
 import { Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-// import { Amplitude } from '@amplitude/react-native';
 import * as Amplitude from 'expo-analytics-amplitude';
 import HomeScreen from "./screens/homeScreen/homeScreen";
 import ScannerScreen from "./screens/scannerScreen/scannerScreen";

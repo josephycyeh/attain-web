@@ -21,8 +21,6 @@ import {
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
-// import { Amplitude } from '@amplitude/react-native';
-// import amplitude from 'amplitude-js';
 import * as Amplitude from 'expo-analytics-amplitude';
 
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";

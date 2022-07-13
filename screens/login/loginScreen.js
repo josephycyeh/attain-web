@@ -15,7 +15,6 @@ import {
 
 import Text from "../../components/Text"
 
-
 import { UserContext } from "../../context/userContext";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 

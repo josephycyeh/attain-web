@@ -11,12 +11,12 @@ import Text from './Text.js'
 import Highlight from "./Highlight";
 import AddItemModal from "./AddItemModal";
 import { UserContext } from "../context/userContext";
-// import { Amplitude } from '@amplitude/react-native';
-// import amplitude from 'amplitude-js';
 import * as Amplitude from 'expo-analytics-amplitude';
 
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
+
+Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
 
 const styles = StyleSheet.create({
     homeContainer: {
@@ -149,11 +149,6 @@ const styles = StyleSheet.create({
    
     },
   })
-
-
-//   const ampInstance = Amplitude.getInstance();
-//   ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
-  Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
 
 const ItemCard = ({item, highlighted, screenName}) => {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
