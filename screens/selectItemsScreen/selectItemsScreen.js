@@ -286,7 +286,7 @@ export default function SelectItemsScreen({ navigation, route }) {
           numColumns={2}
           data={getItemsData.itemsByFilter}
           renderItem={({ item }) => (
-          <ItemCard item={item}/>)}
+          <ItemCard item={item} screenName="categories"/>)}
           keyExtractor={(item) => item.id}
           onEndReached={() => {
             fetchMoreItemsQuery({

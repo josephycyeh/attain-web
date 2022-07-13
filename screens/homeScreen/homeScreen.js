@@ -13,6 +13,7 @@ import {
 
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
+import algoliasearch from "algoliasearch";
 import {
   useGetItemsQuery,
   useGetOrdersQuery,
@@ -20,6 +21,7 @@ import {
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
+import * as Amplitude from 'expo-analytics-amplitude';
 
 import SelectItemsScreen from "../selectItemsScreen/selectItemsScreen";
 import SearchResultsScreen from "../searchResultsScreen/searchResultsScreen";
@@ -31,12 +33,13 @@ import { UserContext } from "../../context/userContext";
 import { getAuth, signOut } from "firebase/auth";
 import ItemCard from "../../components/ItemCard"
 
-
-
-
-
 const screenWidth = Dimensions.get('window').width;
 const fontScale = PixelRatio.getFontScale()
+
+// const ampInstance = Amplitude.getInstance();
+// ampInstance.init("3b0e62f88e06cf0de6e5009d92924990");
+Amplitude.initializeAsync("3b0e62f88e06cf0de6e5009d92924990");
+
 
 const fontScalerCalculator = (scaler) => {
 
@@ -279,10 +282,14 @@ function HomeComponent({ navigation }) {
   if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
 
+
   const orderPressed = (order) => {
     navigation.navigate("OrderDetail", {
       orderId: order.id,
     });
+    // ampInstance.logEvent('ORDER_CLICKED');
+    Amplitude.logEventAsync('ORDER_CLICKED')
+    // ampInstance.trackingSessionEvents(true);
   };
 
   const logoutButtonPressed = async () => {
@@ -290,9 +297,9 @@ function HomeComponent({ navigation }) {
   };
 
   const searchBarPressed = () => {
-
-
     navigation.navigate("SearchResults");
+    // ampInstance.logEvent('SEARCH_CLICKED');
+    Amplitude.logEventAsync('SEARCH_CLICKED')
   };
 
 
@@ -302,10 +309,12 @@ function HomeComponent({ navigation }) {
       category: category,
       title: category.name,
     });
+    // ampInstance.logEvent('CATEGORY_CLICKED')
+    Amplitude.logEventAsync('CATEGORY_CLICKED')
   };
 
   const renderItem = ({ item }) => (
-    <ItemCard item={item}/>
+    <ItemCard item={item} screenName="home"/>
   )
   
   return (
