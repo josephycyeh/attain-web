@@ -180,6 +180,14 @@ const styles = StyleSheet.create({
   },
 });
 
+const getCartTotal = (items) => {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        total = total + items[i].price * items[i].quantity
+    }
+    return total;
+};
+
 function CartScreenComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const { loading, data, error } = useGetCartsQuery({
@@ -205,6 +213,7 @@ function CartScreenComponent({ navigation }) {
   if (error) return <Text>Error.....</Text>;
 
   const cart = data.carts[0];
+//   const total = getCartTotal(cart.cartItems);
   const goToCheckout = () => {
     navigation.navigate("CheckoutScreen", {
       cartId: cart.id,
@@ -248,7 +257,7 @@ function CartScreenComponent({ navigation }) {
           }}
         >
           <Text style={styles.boldMainText}>Subtotal</Text>
-          <Text style={styles.boldMainText}>${cart.subtotal}</Text>
+          <Text style={styles.boldMainText}>${getCartTotal(cart.cartItems)}</Text>
         </View>
         <View
           style={{
