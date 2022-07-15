@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const getCartTotal = (items) => {
+const getTotal = (items) => {
     let total = 0;
     for (let i = 0; i < items.length; i++) {
         total = total + items[i].price * items[i].quantity
