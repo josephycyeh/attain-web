@@ -14,6 +14,7 @@ import {
   Dimensions,
   PixelRatio
 } from "react-native";
+import { format, add } from "date-fns";
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
 import algoliasearch from "algoliasearch";
@@ -291,10 +292,18 @@ function OrderComponent({ navigation }) {
                   <Text
                     style={[
                       styles.bodyText,
-                      { textAlign: "left", marginBottom: 0 },
+                      { textAlign: "left", marginBottom: 5 },
                     ]}
                   >
                     Status
+                  </Text>
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      { textAlign: "left", marginBottom: 0 },
+                    ]}
+                  >
+                    Est. Delivery: {format(add(new Date(item.date_submitted), { days: 1 }), "MM/dd/yyyy")}
                   </Text>
                 </View>
                 <View>
