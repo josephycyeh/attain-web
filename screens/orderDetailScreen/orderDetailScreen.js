@@ -136,6 +136,14 @@ const styles = StyleSheet.create({
   },
 });
 
+const getTotal = (items) => {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        total = total + items[i].price * items[i].quantity
+    }
+    return Math.round(total * 100) / 100;
+};
+
 export default function OrderDetailScreen({ navigation, route }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const { upcCode, orderId } = route.params;
@@ -194,7 +202,7 @@ export default function OrderDetailScreen({ navigation, route }) {
                       { textAlign: "right", marginBottom: 5 },
                     ]}
                   >
-                    ${order.subtotal}
+                    ${getTotal(order.orderItems)}
                   </Text>
                   <Text
                     style={[styles.mutedBodyTextSmall, { textAlign: "right" }]}

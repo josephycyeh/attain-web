@@ -14,6 +14,7 @@ import {
   Dimensions,
   PixelRatio
 } from "react-native";
+import { format, add } from "date-fns";
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
 import algoliasearch from "algoliasearch";
@@ -213,6 +214,14 @@ const styles = StyleSheet.create({
   },
 });
 
+const getTotal = (items) => {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        total = total + items[i].price * items[i].quantity
+    }
+    return Math.round(total * 100) / 100;
+};
+
 function OrderComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
 
@@ -283,10 +292,18 @@ function OrderComponent({ navigation }) {
                   <Text
                     style={[
                       styles.bodyText,
-                      { textAlign: "left", marginBottom: 0 },
+                      { textAlign: "left", marginBottom: 5 },
                     ]}
                   >
                     Status
+                  </Text>
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      { textAlign: "left", marginBottom: 0 },
+                    ]}
+                  >
+                    Est. Delivery: {format(add(new Date(item.date_submitted), { days: 1 }), "MM/dd/yyyy")}
                   </Text>
                 </View>
                 <View>
@@ -296,7 +313,7 @@ function OrderComponent({ navigation }) {
                       { textAlign: "right", marginBottom: 5 },
                     ]}
                   >
-                    ${item.subtotal}
+                    ${getTotal(item.orderItems)}
                   </Text>
                   <Text
                     style={[
