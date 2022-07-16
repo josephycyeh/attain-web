@@ -218,7 +218,7 @@ const getTotal = (items) => {
     for (let i = 0; i < items.length; i++) {
         total = total + items[i].price * items[i].quantity
     }
-    return total;
+    return Math.round(total * 100) / 100;
 };
 
 function OrderComponent({ navigation }) {

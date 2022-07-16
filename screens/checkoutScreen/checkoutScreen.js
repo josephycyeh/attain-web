@@ -251,7 +251,7 @@ export default function CheckoutScreen({ navigation, route }) {
               <View style={styles.itemDetailLine}>
                 <Text style={styles.boldSecondaryText}>Est Delivery</Text>
                 <Text style={styles.boldSecondaryText}>
-                  {format(add(new Date(), { days: 3 }), "MM/dd/yyyy")}
+                  {format(add(new Date(), { days: 1 }), "MM/dd/yyyy")}
                 </Text>
               </View>
             </View>

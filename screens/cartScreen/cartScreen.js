@@ -185,7 +185,7 @@ const getTotal = (items) => {
     for (let i = 0; i < items.length; i++) {
         total = total + items[i].price * items[i].quantity
     }
-    return total;
+    return Math.round(total * 100) / 100;
 };
 
 function CartScreenComponent({ navigation }) {
@@ -257,7 +257,7 @@ function CartScreenComponent({ navigation }) {
           }}
         >
           <Text style={styles.boldMainText}>Subtotal</Text>
-          <Text style={styles.boldMainText}>${getCartTotal(cart.cartItems)}</Text>
+          <Text style={styles.boldMainText}>${getTotal(cart.cartItems)}</Text>
         </View>
         <View
           style={{
