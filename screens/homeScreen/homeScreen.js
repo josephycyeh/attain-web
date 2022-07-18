@@ -10,6 +10,8 @@ import {
   Dimensions,
   PixelRatio
 } from "react-native";
+import { format, add } from "date-fns";
+
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
 import {
@@ -445,11 +447,19 @@ function HomeComponent({ navigation }) {
                             maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
-                              { textAlign: "left", marginBottom: 0 },
+                              { textAlign: "left", marginBottom: 5 },
                             ]}
                           >
                             Status
                           </Text>
+                          <Text
+                            style={[
+                            styles.bodyText,
+                            { textAlign: "left", marginBottom: 0 },
+                            ]}
+                        >
+                            Est. Delivery
+                        </Text>
                         </View>
                         <View>
                           <Text
@@ -475,11 +485,20 @@ function HomeComponent({ navigation }) {
                             maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
-                              { textAlign: "right", marginBottom: 0 },
+                              { textAlign: "right", marginBottom: 5 },
                             ]}
                           >
                             {order.status}
                           </Text>
+                          <Text
+                            style={[
+                            styles.bodyText,
+                            { textAlign: "left", marginBottom: 0 },
+                            ]}
+                        >
+                            {format(add(new Date(order.date_submitted), { days: 1 }), "MM/dd/yyyy")}
+                        </Text>
+                          
                         </View>
                       </TouchableOpacity>
                     );
