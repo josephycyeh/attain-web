@@ -72,12 +72,13 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
-  itemContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 10,
-    marginBottom: 100,
-  },
+//   itemContainer: {
+//     flex: 1,
+//     flexDirection: "column",
+//     flexWrap: "wrap",
+//     marginTop: 10,
+//     marginBottom: 100,
+//   },
   boldMainText: {
     fontSize: 20,
     fontWeight: "600",
@@ -169,15 +170,29 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     borderStyle: "solid",
-    borderWidth: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flex: 1,
+    // flexDirection: "row",
+    // flexWrap: "wrap",
     justifyContent: "space-between",
-    borderRadius: 20,
+    borderRadius: 0,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
     padding: 10,
     marginTop: 10,
     marginBottom: 10,
   },
+  itemName: {
+    marginTop: 0,
+    marginBottom: 10,
+  },
+  itemContent: {
+    fontSize: 15,
+    fontWeight: "600",
+    flexDirection: "row",
+    flexWrap: "wrap",
+  }
 });
 
 const getTotal = (items) => {
@@ -213,7 +228,6 @@ function CartScreenComponent({ navigation }) {
   if (error) return <Text>Error.....</Text>;
 
   const cart = data.carts[0];
-//   const total = getCartTotal(cart.cartItems);
   const goToCheckout = () => {
     navigation.navigate("CheckoutScreen", {
       cartId: cart.id,
@@ -300,19 +314,42 @@ function CartScreenComponent({ navigation }) {
           {cart.cartItems.map((cartItem) => {
             return (
               <View key={cartItem.id} style={styles.itemContainer}>
-                <View>
-                  <Text style={styles.boldSecondaryText}>{cartItem.name}</Text>
-                  <Text style={styles.boldSecondaryText}>
-                    Sku#: {cartItem.id}
-                  </Text>
-                  <Text style={styles.boldSecondaryText}>
-                    Unit Size: {cartItem.unit_size}
-                  </Text>
-                  <Text style={styles.boldSecondaryText}>
-                    Price: {cartItem.price}
-                  </Text>
+                <View style={styles.itemName}>
+                    <Text>{cartItem.name}</Text>
                 </View>
-               
+                <View style={styles.itemContent}>
+                    <Image style={styles.itemImage} 
+                    source={{
+                        uri: cartItem.image
+                        ? cartItem.image
+                        : "https://via.placeholder.com/150",
+                    }} />
+                <View style={styles.itemTextContainer}>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Sku#: {cartItem.id}
+                    </Text>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Unit Size: {cartItem.unit_size}ct
+                    </Text>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Case Cost: {cartItem.price}
+                    </Text>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Unit Cost: {Math.round(100*cartItem.price/cartItem.unit_size)/100}
+                    </Text>
+                </View>
                 <View
                   style={{
                     flexDirection: "column",
@@ -347,7 +384,7 @@ function CartScreenComponent({ navigation }) {
                   </TouchableOpacity>
                 </View>
                 </View>
-             
+                </View>
             );
           })}
         </View>
