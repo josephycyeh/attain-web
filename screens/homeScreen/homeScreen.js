@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, SafeAreaView, ScrollView, FlatList, StatusBar, 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { format, add } from "date-fns";
 import algoliasearch from 'algoliasearch';
 import { InstantSearch, connectStateResults } from 'react-instantsearch-native';
 import SearchBox from '../../components/SearchBox';
@@ -425,9 +426,13 @@ const categorySelected = (category) => {
               Order#: {order.id}
             </Text> 
 
-            <Text style={[styles.bodyText, {textAlign: "left", marginBottom: 0}]}>
+            <Text style={[styles.bodyText, {textAlign: "left", marginBottom: 5}]}>
               Status
             </Text>  
+
+            <Text style={[styles.bodyText, { textAlign: "left", marginBottom: 0 }]}>
+                Est. Delivery: {format(add(new Date(order.date_submitted), { days: 1 }), "MM/dd/yyyy")}
+            </Text>
             
             </View>
             <View>

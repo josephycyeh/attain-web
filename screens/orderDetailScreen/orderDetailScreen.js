@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { format, add } from "date-fns";
 import NumericInput from 'react-native-numeric-input'
 import { useGetItemsQuery, useGetCartsQuery, useUpdateItemInCartMutation, useAddItemToCartMutation, useGetOrdersQuery} from '../../generated/graphql'
 
@@ -169,9 +170,12 @@ export default function OrderDetailScreen({ navigation, route }) {
            <Text style={[styles.bodyText, {textAlign: "left", marginBottom: 5}]}>
               {new Date(order.date_submitted).toDateString()}
             </Text>  
-            <Text style={[styles.mutedBodyTextSmall, {textAlign: "left"}]}>
+            <Text style={[styles.mutedBodyTextSmall, {textAlign: "left", marginBottom: 5}]}>
               Order#: {order.id}
             </Text> 
+            <Text style={[styles.bodyText, { textAlign: "left", marginBottom: 0 }]}>
+              Est. Delivery: {format(add(new Date(order.date_submitted), { days: 1 }), "MM/dd/yyyy")}
+            </Text>
             </View>
             <View>
            <Text style={[styles.bodyText, {textAlign: "right", marginBottom:5}]}>
