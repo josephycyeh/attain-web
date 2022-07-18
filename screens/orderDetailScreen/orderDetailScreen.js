@@ -10,6 +10,8 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import { format, add } from "date-fns";
+
 import Text from "../../components/Text"
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -190,10 +192,18 @@ export default function OrderDetailScreen({ navigation, route }) {
                     {new Date(order.date_submitted).toDateString()}
                   </Text>
                   <Text
-                    style={[styles.mutedBodyTextSmall, { textAlign: "left" }]}
+                    style={[styles.mutedBodyTextSmall, { textAlign: "left", marginBottom: 5 }]}
                   >
                     Order#: {order.id}
                   </Text>
+                <Text
+                    style={[
+                    styles.bodyText,
+                    { textAlign: "left", marginBottom: 0 },
+                    ]}
+                >
+                    Est. Delivery
+                </Text>
                 </View>
                 <View>
                   <Text
@@ -205,10 +215,18 @@ export default function OrderDetailScreen({ navigation, route }) {
                     ${getTotal(order.orderItems)}
                   </Text>
                   <Text
-                    style={[styles.mutedBodyTextSmall, { textAlign: "right" }]}
+                    style={[styles.mutedBodyTextSmall, { textAlign: "right", marginBottom: 5 }]}
                   >
                     {order.orderItems.length} Items
                   </Text>
+                  <Text
+                        style={[
+                        styles.bodyText,
+                        { textAlign: "left", marginBottom: 0 },
+                        ]}
+                    >
+                    {format(add(new Date(order.date_submitted), { days: 1 }), "MM/dd/yyyy")}
+                </Text>
                 </View>
               </View>
             </View>
