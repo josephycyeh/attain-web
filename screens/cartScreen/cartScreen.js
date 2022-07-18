@@ -10,6 +10,7 @@ import {
   Image,
   PixelRatio
 } from "react-native";
+import Checkbox from "expo-checkbox";
 import { NavigationContainer } from "@react-navigation/native";
 import Text from '../../components/Text'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -169,30 +170,43 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   itemContainer: {
-    borderStyle: "solid",
     flex: 1,
-    // flexDirection: "row",
-    // flexWrap: "wrap",
     justifyContent: "space-between",
-    borderRadius: 0,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 10,
+    paddingVertical: 10
   },
   itemName: {
     marginTop: 0,
     marginBottom: 10,
-  },
-  itemContent: {
     fontSize: 15,
     fontWeight: "600",
+  },
+  itemContent: {
     flexDirection: "row",
     flexWrap: "wrap",
-  }
+  },
+  itemTotalCost: {
+    marginLeft: "auto", 
+    marginRight: "auto",
+    marginTop: 10
+  },
+  withCheckBoxContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    borderStyle: "solid",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderLeftWidth: 0,
+    borderRightWidth: 0
+  },
+  checkBox: {
+    marginRight: 10,
+    justifyContent: "center"
+  },
+  itemManagement: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
 });
 
 const getTotal = (items) => {
@@ -228,6 +242,7 @@ function CartScreenComponent({ navigation }) {
   if (error) return <Text>Error.....</Text>;
 
   const cart = data.carts[0];
+  const [checks, setChecks] = useState(new Array(cart.cartItems.length).fill(false));
   const goToCheckout = () => {
     navigation.navigate("CheckoutScreen", {
       cartId: cart.id,
@@ -245,6 +260,28 @@ function CartScreenComponent({ navigation }) {
       },
     });
   };
+  const checkMarkItem = (index) => {
+    let newArr = checks
+    newArr[index] = !newArr[index]
+    console.log(newArr)
+    setChecks(newArr)
+  }
+  const deleteItems = () => {
+    for (let i = 0; i < cart.cartItems.length; i++) {
+        if (checks[i]) {
+            updateItemInCart({
+                variables: {
+                  updateItemInCartInput: {
+                    cartId: cart.id,
+                    itemId: cart.cartItems.itemId,
+                    quantity: 0,
+                  },
+                },
+              });
+        }
+      }
+    
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View
@@ -293,7 +330,32 @@ function CartScreenComponent({ navigation }) {
 
       <ScrollView style={styles.scrollView}>
         <View style={styles.itemsContainer}>
-          <Text style={styles.secondaryTitleText}>Items</Text>
+            <View style={styles.itemManagement}>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Checkbox
+                        value={true}  
+                    />
+                    <Text style={[{
+                            marginLeft: 10,
+                            fontSize: 15,
+                            fontWeight: "600",
+                            justifyContent: "center"}]}>
+                        Select all items
+                    </Text>
+                </View>
+                <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      width: 60,
+                      borderStyle: "solid",
+                      borderBottomWidth: 1,
+                    }}
+                    onPress={deleteItems}
+                  >
+                    <Text>Delete</Text>
+                  </TouchableOpacity>
+            </View>
           {cart.cartItems.length == 0 && (
             <View style={{ marginTop: "50%" }}>
               <Text
@@ -311,19 +373,27 @@ function CartScreenComponent({ navigation }) {
               </Text>
             </View>
           )}
-          {cart.cartItems.map((cartItem) => {
+          {cart.cartItems.map((cartItem, index) => {
             return (
+              <View style={styles.withCheckBoxContainer}>
+                <View style={styles.checkBox}>
+                    <Checkbox
+                        value={checks[index]}  
+                        onChange={(index) => checkMarkItem(index)}
+                    />
+                </View>
               <View key={cartItem.id} style={styles.itemContainer}>
                 <View style={styles.itemName}>
                     <Text>{cartItem.name}</Text>
                 </View>
                 <View style={styles.itemContent}>
-                    <Image style={styles.itemImage} 
-                    source={{
-                        uri: cartItem.image
-                        ? cartItem.image
-                        : "https://via.placeholder.com/150",
-                    }} />
+                
+                <Image style={styles.itemImage} 
+                source={{
+                    uri: cartItem.image
+                    ? cartItem.image
+                    : "https://via.placeholder.com/150",
+                }} />
                 <View style={styles.itemTextContainer}>
                     <Text style={[
                         styles.boldSecondaryText,
@@ -353,8 +423,9 @@ function CartScreenComponent({ navigation }) {
                 <View
                   style={{
                     flexDirection: "column",
-                    justifyContent: "space-between",
-                    paddingVertical: 20
+                    justifyContent: "center",
+                    paddingVertical: 20,
+
                   }}
                 >
                   <NumericInput
@@ -370,18 +441,10 @@ function CartScreenComponent({ navigation }) {
                       onEditQuantity(cart.id, cartItem.item_id, value)
                     }
                   />
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      backgroundColor: "grey",
-                      borderRadius: 5,
-                      padding: 2,
-                    }}
-                    onPress={() => onEditQuantity(cart.id, cartItem.item_id, 0)}
-                  >
-                    <Text>Delete</Text>
-                  </TouchableOpacity>
+                  <Text style={styles.itemTotalCost}>
+                    ${cartItem.price * cartItem.quantity}
+                  </Text>
+                </View>
                 </View>
                 </View>
                 </View>
