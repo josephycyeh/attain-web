@@ -206,6 +206,14 @@ const styles = StyleSheet.create({
   },
 });
 
+const getTotal = (items) => {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        total = total + items[i].price * items[i].quantity
+    }
+    return total;
+};
+
 function HomeComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const auth = getAuth();
@@ -459,7 +467,7 @@ function HomeComponent({ navigation }) {
                               { textAlign: "right", marginBottom: 5 },
                             ]}
                           >
-                            ${order.subtotal}
+                            ${getTotal(order.orderItems)}
                           </Text>
                           <Text
                             maxFontSizeMultiplier={1.4}

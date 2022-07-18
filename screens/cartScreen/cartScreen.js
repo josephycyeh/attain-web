@@ -257,7 +257,7 @@ function CartScreenComponent({ navigation }) {
           }}
         >
           <Text style={styles.boldMainText}>Subtotal</Text>
-          <Text style={styles.boldMainText}>${getCartTotal(cart.cartItems)}</Text>
+          <Text style={styles.boldMainText}>${getTotal(cart.cartItems)}</Text>
         </View>
         <View
           style={{
