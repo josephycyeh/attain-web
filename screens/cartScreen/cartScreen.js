@@ -27,6 +27,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { UserContext } from "../../context/userContext";
+import HomeScreen from "../homeScreen/homeScreen";
 
 const fontScale = PixelRatio.getFontScale()
 
@@ -227,6 +228,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center"
+  },
+  quantityText: {
+    // borderWidth: 0.5,
+    width: 20,
+    height: 20,
+    fontSize: 15,
+    textAlign: "center",
+    justifyContent: "center"
   }
 });
 
@@ -269,6 +278,9 @@ function CartScreenComponent({ navigation }) {
       cartId: cart.id,
     });
   };
+  const goToHome = () => {
+    navigation.navigate("Home")
+  }
 
   const onEditQuantity = (cartId, itemId, quantity) => {
     updateItemInCart({
@@ -438,21 +450,36 @@ function CartScreenComponent({ navigation }) {
 
                   }}
                 >
-                  <NumericInput
+                  {/* <NumericInput
                     initValue={cartItem.quantity}
                     value={cartItem.quantity}
-                    totalHeight={30}
+                    totalHeight={25}
                     totalWidth={80}
                     rounded
-                    iconSize={100}
+                    iconSize={80}
                     leftButtonBackgroundColor={"#88BEFF"}
                     rightButtonBackgroundColor={"#88BEFF"}
                     onChange={(value) =>
                       onEditQuantity(cart.id, cartItem.item_id, value)
                     }
-                  />
+                  /> */}
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <TouchableOpacity
+                        onPress={() => onEditQuantity(cart.id, cartItem.item_id, cartItem.quantity - 1)}
+                        >
+                        <Icon name="minus-box" type="material-community" color="#88BEFF" size={30}/>
+                    </TouchableOpacity>
+                    <View style={{marginLeft: "auto", marginRight: "auto",}}>
+                        <Text style={styles.quantityText}>{cartItem.quantity}</Text>
+                    </View>
+                    <TouchableOpacity
+                        onPress={() => onEditQuantity(cart.id, cartItem.item_id, cartItem.quantity + 1)}
+                        >
+                        <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.itemTotalCost}>
-                    ${cartItem.price * cartItem.quantity}
+                    ${Math.round(cartItem.price * cartItem.quantity * 100)/100}
                   </Text>
                 </View>
                 </View>
@@ -463,7 +490,7 @@ function CartScreenComponent({ navigation }) {
           {cart.cartItems.length == 0 ? (
             <View style={styles.addItemsContainerNoItems}>
             <TouchableOpacity
-                onPress={() => console.log("Checkpoint")}
+                onPress={goToHome}
                 >
                 <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
             </TouchableOpacity>
@@ -472,7 +499,7 @@ function CartScreenComponent({ navigation }) {
           ) : (
             <View style={styles.addItemsContainer}>
             <TouchableOpacity
-                onPress={() => console.log("Checkpoint")}
+                onPress={goToHome}
                 >
                 <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
             </TouchableOpacity>
