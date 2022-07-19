@@ -8,8 +8,9 @@ import {
   Button,
   TouchableOpacity,
   Image,
-  PixelRatio
+  PixelRatio,
 } from "react-native";
+import { Icon } from 'react-native-elements'
 import Checkbox from "expo-checkbox";
 import { NavigationContainer } from "@react-navigation/native";
 import Text from '../../components/Text'
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
   },
   checkoutButton: {
     backgroundColor: "white",
-    width: 150,
+    width: 180,
     height: "80%",
     justifyContent: "center",
     alignItems: "center",
@@ -193,8 +194,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     borderStyle: "solid",
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
+    borderTopWidth: 0.5,
+    borderBottomWidth: 0.5,
     borderLeftWidth: 0,
     borderRightWidth: 0
   },
@@ -207,6 +208,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 15,
   },
+  deleteButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: 60,
+  },
+  selectAllText: {
+    marginLeft: 10,
+    fontSize: 15,
+    fontWeight: "600",
+    justifyContent: "center"
+  },
+  addItemsButton: {
+    textAlign: "center",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  addItemsContainer: {
+    marginTop: 15,
+    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center"
+  }
 });
 
 const getTotal = (items) => {
@@ -214,7 +237,7 @@ const getTotal = (items) => {
     for (let i = 0; i < items.length; i++) {
         total = total + items[i].price * items[i].quantity
     }
-    return total;
+    return Math.round(total*100)/100;
 };
 
 function CartScreenComponent({ navigation }) {
@@ -261,10 +284,14 @@ function CartScreenComponent({ navigation }) {
     });
   };
   const checkMarkItem = (index) => {
-    let newArr = checks
-    newArr[index] = !newArr[index]
-    console.log(newArr)
-    setChecks(newArr)
+    let temp = checks.map((check, ind) => {
+        if (ind === index) {
+          return !check;
+        }
+        return check;
+      });
+    console.log(temp);
+    setChecks(temp);
   }
   const deleteItems = () => {
     for (let i = 0; i < cart.cartItems.length; i++) {
@@ -307,7 +334,7 @@ function CartScreenComponent({ navigation }) {
             flexDirection: "column",
           }}
         >
-          <Text style={styles.boldMainText}>Subtotal</Text>
+          <Text style={styles.boldMainText}>Total Payment</Text>
           <Text style={styles.boldMainText}>${getTotal(cart.cartItems)}</Text>
         </View>
         <View
@@ -322,7 +349,7 @@ function CartScreenComponent({ navigation }) {
               style={styles.checkoutButton}
               onPress={goToCheckout}
             >
-              <Text style={styles.checkoutButtonText}>Continue</Text>
+              <Text style={styles.checkoutButtonText}>Check Out</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -335,25 +362,12 @@ function CartScreenComponent({ navigation }) {
                     <Checkbox
                         value={true}  
                     />
-                    <Text style={[{
-                            marginLeft: 10,
-                            fontSize: 15,
-                            fontWeight: "600",
-                            justifyContent: "center"}]}>
+                    <Text style={styles.selectAllText}>
                         Select all items
                     </Text>
                 </View>
-                <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      width: 60,
-                      borderStyle: "solid",
-                      borderBottomWidth: 1,
-                    }}
-                    onPress={deleteItems}
-                  >
-                    <Text>Delete</Text>
+                <TouchableOpacity style={styles.deleteButton} onPress={deleteItems}>
+                    <Text style={{textDecorationLine: 'underline'}}>Delete</Text>
                   </TouchableOpacity>
             </View>
           {cart.cartItems.length == 0 && (
@@ -450,6 +464,14 @@ function CartScreenComponent({ navigation }) {
                 </View>
             );
           })}
+          <View style={styles.addItemsContainer}>
+            <TouchableOpacity
+                onPress={() => console.log("Checkpoint")}
+                >
+                <Icon name="plus-box" type="material-community"/>
+            </TouchableOpacity>
+            <Text style={styles.addItemsButton}>Add more items</Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
