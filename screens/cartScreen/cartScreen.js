@@ -74,13 +74,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
-//   itemContainer: {
-//     flex: 1,
-//     flexDirection: "column",
-//     flexWrap: "wrap",
-//     marginTop: 10,
-//     marginBottom: 100,
-//   },
   boldMainText: {
     fontSize: 20,
     fontWeight: "600",
@@ -144,7 +137,7 @@ const styles = StyleSheet.create({
   boldMainTextColor: {
     fontSize: 25,
     fontWeight: "600",
-    color: "#3C95FF",
+    color: "#88BEFF",
   },
   checkoutButton: {
     backgroundColor: "white",
@@ -157,7 +150,7 @@ const styles = StyleSheet.create({
   checkoutButtonText: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#3C95FF",
+    color: "#88BEFF",
     textAlign: "center",
   },
   secondaryTitleText: {
@@ -168,7 +161,7 @@ const styles = StyleSheet.create({
   },
   itemsContainer: {
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 30,
   },
   itemContainer: {
     flex: 1,
@@ -195,9 +188,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     borderStyle: "solid",
     borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    borderLeftWidth: 0,
-    borderRightWidth: 0
   },
   checkBox: {
     marginRight: 10,
@@ -223,9 +213,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 15,
     fontWeight: "600",
+    marginRight: 5
   },
   addItemsContainer: {
-    marginTop: 15,
+    borderTopWidth: 0.5,
+    marginTop: 0,
+    paddingTop: 15,
+    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  addItemsContainerNoItems: {
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center"
@@ -283,31 +281,30 @@ function CartScreenComponent({ navigation }) {
       },
     });
   };
-  const checkMarkItem = (index) => {
+  const checkSingleItem = (index) => {
+    // console.log("Index = " + index)
     let temp = checks.map((check, ind) => {
         if (ind === index) {
           return !check;
         }
         return check;
       });
-    console.log(temp);
+    // console.log(temp);
     setChecks(temp);
+  }
+  const checkAllItems = () => {
+    if (checks.every(elem => elem === true)) {
+        setChecks(new Array(cart.cartItems.length).fill(false))
+    } else {
+        setChecks(new Array(cart.cartItems.length).fill(true))
+    }
   }
   const deleteItems = () => {
     for (let i = 0; i < cart.cartItems.length; i++) {
         if (checks[i]) {
-            updateItemInCart({
-                variables: {
-                  updateItemInCartInput: {
-                    cartId: cart.id,
-                    itemId: cart.cartItems.itemId,
-                    quantity: 0,
-                  },
-                },
-              });
+            onEditQuantity(cart.id, cart.cartItems[i].item_id, 0)
         }
       }
-    
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -322,9 +319,9 @@ function CartScreenComponent({ navigation }) {
           bottom: 0,
           width: "100%",
           height: 65,
-          backgroundColor: "#3C95FF",
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
+          backgroundColor: "#88BEFF",
+        //   borderTopLeftRadius: 10,
+        //   borderTopRightRadius: 10,
         }}
       >
         <View
@@ -357,19 +354,6 @@ function CartScreenComponent({ navigation }) {
 
       <ScrollView style={styles.scrollView}>
         <View style={styles.itemsContainer}>
-            <View style={styles.itemManagement}>
-                <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <Checkbox
-                        value={true}  
-                    />
-                    <Text style={styles.selectAllText}>
-                        Select all items
-                    </Text>
-                </View>
-                <TouchableOpacity style={styles.deleteButton} onPress={deleteItems}>
-                    <Text style={{textDecorationLine: 'underline'}}>Delete</Text>
-                  </TouchableOpacity>
-            </View>
           {cart.cartItems.length == 0 && (
             <View style={{ marginTop: "50%" }}>
               <Text
@@ -377,14 +361,24 @@ function CartScreenComponent({ navigation }) {
               >
                 No Items In Cart
               </Text>
-              <Text
-                style={[
-                  styles.thirdTitleText,
-                  { marginTop: "5%", textAlign: "center" },
-                ]}
-              >
-                Add Items To Cart To Checkout
-              </Text>
+            </View>
+          )}
+          {cart.cartItems.length !== 0 && (
+             <View style={styles.itemManagement}>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Checkbox
+                        value={checks.every(elem => elem === true)} 
+                        onChange={checkAllItems}
+                        onValueChange={checkAllItems}
+                        color={true ? '#88BEFF' : undefined} 
+                    />
+                    <Text style={styles.selectAllText}>
+                        Select all items
+                    </Text>
+                </View>
+                <TouchableOpacity style={styles.deleteButton} onPress={deleteItems}>
+                    <Text style={{textDecorationLine: 'underline'}}>Delete</Text>
+                </TouchableOpacity>
             </View>
           )}
           {cart.cartItems.map((cartItem, index) => {
@@ -393,7 +387,9 @@ function CartScreenComponent({ navigation }) {
                 <View style={styles.checkBox}>
                     <Checkbox
                         value={checks[index]}  
-                        onChange={(index) => checkMarkItem(index)}
+                        onChange={() => checkSingleItem(index)}
+                        onValueChange={() => checkSingleItem(index)}
+                        color={checks[index] ? '#88BEFF' : undefined}
                     />
                 </View>
               <View key={cartItem.id} style={styles.itemContainer}>
@@ -438,7 +434,7 @@ function CartScreenComponent({ navigation }) {
                   style={{
                     flexDirection: "column",
                     justifyContent: "center",
-                    paddingVertical: 20,
+                    paddingVertical: 0,
 
                   }}
                 >
@@ -464,14 +460,26 @@ function CartScreenComponent({ navigation }) {
                 </View>
             );
           })}
-          <View style={styles.addItemsContainer}>
+          {cart.cartItems.length == 0 ? (
+            <View style={styles.addItemsContainerNoItems}>
             <TouchableOpacity
                 onPress={() => console.log("Checkpoint")}
                 >
-                <Icon name="plus-box" type="material-community"/>
+                <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
             </TouchableOpacity>
             <Text style={styles.addItemsButton}>Add more items</Text>
           </View>
+          ) : (
+            <View style={styles.addItemsContainer}>
+            <TouchableOpacity
+                onPress={() => console.log("Checkpoint")}
+                >
+                <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
+            </TouchableOpacity>
+            <Text style={styles.addItemsButton}>Add more items</Text>
+          </View>
+          )}
+          
         </View>
       </ScrollView>
     </SafeAreaView>
