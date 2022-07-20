@@ -159,6 +159,14 @@ const styles = StyleSheet.create({
   },
 });
 
+const getTotal = (items) => {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        total = total + items[i].price * items[i].quantity
+    }
+    return total;
+};
+
 export default function CheckoutScreen({ navigation, route }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
 
@@ -218,7 +226,7 @@ export default function CheckoutScreen({ navigation, route }) {
           }}
         >
           <Text style={styles.boldMainText}>Subtotal</Text>
-          <Text style={styles.boldMainText}>${cart.subtotal}</Text>
+          <Text style={styles.boldMainText}>${getTotal(cart.cartItems)}</Text>
         </View>
         <View
           style={{

@@ -17,6 +17,8 @@ import {
 import Text from "../../components/Text"
 import { createStackNavigator } from "@react-navigation/stack";
 import algoliasearch from "algoliasearch";
+import { format, add } from "date-fns";
+
 import {
   useGetOrdersQuery,
 } from "../../generated/graphql";
@@ -213,6 +215,14 @@ const styles = StyleSheet.create({
   },
 });
 
+const getTotal = (items) => {
+    let total = 0;
+    for (let i = 0; i < items.length; i++) {
+        total = total + items[i].price * items[i].quantity
+    }
+    return total;
+};
+
 function OrderComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
 
@@ -283,11 +293,19 @@ function OrderComponent({ navigation }) {
                   <Text
                     style={[
                       styles.bodyText,
-                      { textAlign: "left", marginBottom: 0 },
+                      { textAlign: "left", marginBottom: 5 },
                     ]}
                   >
                     Status
                   </Text>
+                  <Text
+                    style={[
+                    styles.bodyText,
+                    { textAlign: "left", marginBottom: 0 },
+                    ]}
+                >
+                    Est. Delivery
+                </Text>
                 </View>
                 <View>
                   <Text
@@ -296,7 +314,7 @@ function OrderComponent({ navigation }) {
                       { textAlign: "right", marginBottom: 5 },
                     ]}
                   >
-                    ${item.subtotal}
+                    ${getTotal(item.orderItems)}
                   </Text>
                   <Text
                     style={[
@@ -310,11 +328,19 @@ function OrderComponent({ navigation }) {
                   <Text
                     style={[
                       styles.bodyText,
-                      { textAlign: "right", marginBottom: 0 },
+                      { textAlign: "right", marginBottom: 5 },
                     ]}
                   >
                     {item.status}
                   </Text>
+                  <Text
+                    style={[
+                    styles.bodyText,
+                    { textAlign: "left", marginBottom: 0 },
+                    ]}
+                >
+                    {format(add(new Date(item.date_submitted), { days: 1 }), "MM/dd/yyyy")}
+                </Text>
                 </View>
               </TouchableOpacity>
                 
