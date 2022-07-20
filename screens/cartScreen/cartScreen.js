@@ -27,7 +27,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { UserContext } from "../../context/userContext";
-import HomeScreen from "../homeScreen/homeScreen";
 
 const fontScale = PixelRatio.getFontScale()
 
@@ -142,7 +141,7 @@ const styles = StyleSheet.create({
   },
   checkoutButton: {
     backgroundColor: "white",
-    width: 180,
+    width: 170,
     height: "80%",
     justifyContent: "center",
     alignItems: "center",
@@ -411,11 +410,11 @@ function CartScreenComponent({ navigation }) {
                 <View style={styles.itemContent}>
                 
                 <Image style={styles.itemImage} 
-                source={{
-                    uri: cartItem.image
-                    ? cartItem.image
-                    : "https://via.placeholder.com/150",
-                }} />
+                    source={{
+                        uri: cartItem.image
+                        ? cartItem.image
+                        : "https://via.placeholder.com/150",
+                    }} />
                 <View style={styles.itemTextContainer}>
                     <Text style={[
                         styles.boldSecondaryText,
@@ -447,22 +446,8 @@ function CartScreenComponent({ navigation }) {
                     flexDirection: "column",
                     justifyContent: "center",
                     paddingVertical: 0,
-
                   }}
                 >
-                  {/* <NumericInput
-                    initValue={cartItem.quantity}
-                    value={cartItem.quantity}
-                    totalHeight={25}
-                    totalWidth={80}
-                    rounded
-                    iconSize={80}
-                    leftButtonBackgroundColor={"#88BEFF"}
-                    rightButtonBackgroundColor={"#88BEFF"}
-                    onChange={(value) =>
-                      onEditQuantity(cart.id, cartItem.item_id, value)
-                    }
-                  /> */}
                   <View style={{flexDirection: "row", alignItems: "center"}}>
                     <TouchableOpacity
                         onPress={() => onEditQuantity(cart.id, cartItem.item_id, cartItem.quantity - 1)}
