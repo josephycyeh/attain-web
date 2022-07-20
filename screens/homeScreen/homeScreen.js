@@ -281,7 +281,7 @@ function HomeComponent({ navigation }) {
 
   const searchBarPressed = async () => {
     navigation.navigate("SearchResults");
-      await Amplitude.logEventAsync('SEARCH_CLICKED')
+    await Amplitude.logEventAsync('SEARCH_CLICKED')
     
   };
 

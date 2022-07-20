@@ -20,7 +20,7 @@ import {
 } from "../../generated/graphql";
 import { UserContext } from "../../context/userContext";
 import { format, add } from "date-fns";
-
+import * as Amplitude from 'expo-analytics-amplitude';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -174,7 +174,7 @@ export default function CheckoutScreen({ navigation, route }) {
 
   const cart = user.cart
 
-  const submitOrderClicked = () => {
+  const submitOrderClicked = async () => {
     try {
       submitOrder({
         variables: {
@@ -184,9 +184,11 @@ export default function CheckoutScreen({ navigation, route }) {
           },
         },
       });
+      await Amplitude.logEventAsync("ORDER_SUBMITTED")
     } catch (err) {}
 
     navigation.navigate("OrderSubmittedScreen");
+
   };
 
 
