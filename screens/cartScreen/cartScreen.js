@@ -378,8 +378,7 @@ function CartScreenComponent({ navigation }) {
              <View style={styles.itemManagement}>
                 <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Checkbox
-                        value={checks.every(elem => elem === true)} 
-                        onChange={checkAllItems}
+                        value={checks.every(elem => elem === true)}
                         onValueChange={checkAllItems}
                         color={true ? '#88BEFF' : undefined} 
                     />
@@ -394,11 +393,10 @@ function CartScreenComponent({ navigation }) {
           )}
           {cart.cartItems.map((cartItem, index) => {
             return (
-              <View style={styles.withCheckBoxContainer}>
+              <View key={cartItem.id} style={styles.withCheckBoxContainer}>
                 <View style={styles.checkBox}>
                     <Checkbox
                         value={checks[index]}  
-                        onChange={() => checkSingleItem(index)}
                         onValueChange={() => checkSingleItem(index)}
                         color={checks[index] ? '#88BEFF' : undefined}
                     />

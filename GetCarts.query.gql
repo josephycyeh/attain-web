@@ -12,6 +12,7 @@ query GetCarts($getCartsInput: GetCartsInput!) {
       nacs_subcategory
       quantity
       item_id
+      image
     }
     subtotal
   }
