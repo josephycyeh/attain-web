@@ -246,6 +246,18 @@ const getTotal = (items) => {
     return Math.round(total*100)/100;
 };
 
+const areAllSelected = (obj) => {
+    let temp = []
+    for (var key in obj) {
+        temp.push(obj[key]);
+    }
+    return temp.every(elem => elem === true);
+}
+
+const test = (obj, key) => {
+    return obj[key] === true;
+}
+
 function CartScreenComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
   const { loading, data, error } = useGetCartsQuery({
@@ -271,7 +283,12 @@ function CartScreenComponent({ navigation }) {
   if (error) return <Text>Error.....</Text>;
 
   const cart = data.carts[0];
-  const [checks, setChecks] = useState(new Array(cart.cartItems.length).fill(false));
+  let temp = {};
+  for (let i = 0; i < cart.cartItems.length; i++) {
+    temp[cart.cartItems[i].id] = false
+  }
+  const [checks, setChecks] = useState(temp);
+  
   const goToCheckout = () => {
     navigation.navigate("CheckoutScreen", {
       cartId: cart.id,
@@ -293,27 +310,46 @@ function CartScreenComponent({ navigation }) {
     });
   };
   const checkSingleItem = (index) => {
-    // console.log("Index = " + index)
-    let temp = checks.map((check, ind) => {
-        if (ind === index) {
-          return !check;
+    let newChecks = {};
+    for (let i = 0; i < cart.cartItems.length; i++) {
+        if (cart.cartItems[i].id === index) {
+            newChecks[cart.cartItems[i].id] = !checks[cart.cartItems[i].id]
+        } else {
+            newChecks[cart.cartItems[i].id] = checks[cart.cartItems[i].id]
         }
-        return check;
-      });
-    // console.log(temp);
-    setChecks(temp);
+    }
+    setChecks(newChecks);
   }
+
   const checkAllItems = () => {
-    if (checks.every(elem => elem === true)) {
-        setChecks(new Array(cart.cartItems.length).fill(false))
+    let temp = []
+    for (var key in checks) {
+        temp.push(checks[key]);
+    }
+    let newChecks = {};
+    if (temp.every(elem => elem === true)) {
+        for (let i = 0; i < cart.cartItems.length; i++) {
+            newChecks[cart.cartItems[i].id] = false
+        }
+        setChecks(newChecks);
     } else {
-        setChecks(new Array(cart.cartItems.length).fill(true))
+        for (let i = 0; i < cart.cartItems.length; i++) {
+            newChecks[cart.cartItems[i].id] = true
+        }
+        setChecks(newChecks);
     }
   }
   const deleteItems = () => {
-    for (let i = 0; i < cart.cartItems.length; i++) {
-        if (checks[i]) {
-            onEditQuantity(cart.id, cart.cartItems[i].item_id, 0)
+    for (var key in checks) {
+        if (checks[key]) {
+            let item_id;
+            for (let i = 0; i < cart.cartItems.length; i++) {
+                if (cart.cartItems[i].id == key) {
+                    item_id = cart.cartItems[i].item_id;
+                    break;
+                }
+            }
+            onEditQuantity(cart.id, item_id, 0)
         }
       }
   }
@@ -378,7 +414,7 @@ function CartScreenComponent({ navigation }) {
              <View style={styles.itemManagement}>
                 <View style={{flexDirection: "row", alignItems: "center"}}>
                     <Checkbox
-                        value={checks.every(elem => elem === true)}
+                        value={areAllSelected(checks)}
                         onValueChange={checkAllItems}
                         color={true ? '#88BEFF' : undefined} 
                     />
@@ -391,14 +427,14 @@ function CartScreenComponent({ navigation }) {
                 </TouchableOpacity>
             </View>
           )}
-          {cart.cartItems.map((cartItem, index) => {
+          {cart.cartItems.map((cartItem) => {
             return (
               <View key={cartItem.id} style={styles.withCheckBoxContainer}>
                 <View style={styles.checkBox}>
                     <Checkbox
-                        value={checks[index]}  
-                        onValueChange={() => checkSingleItem(index)}
-                        color={checks[index] ? '#88BEFF' : undefined}
+                        value={test(checks, cartItem.id)}  
+                        onValueChange={() => checkSingleItem(cartItem.id)}
+                        color={checks[cartItem.id] ? '#88BEFF' : undefined}
                     />
                 </View>
               <View key={cartItem.id} style={styles.itemContainer}>
