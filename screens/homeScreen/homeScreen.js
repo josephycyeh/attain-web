@@ -18,6 +18,7 @@ import {
   useGetItemsQuery,
   useGetOrdersQuery,
   useGetCategoriesQuery,
+  useGetItemsBySectionQuery,
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   scrollView: {
-    paddingLeft: 20, marginVertical: 10,
+    paddingLeft: 20, marginVertical: 10
   },
   titleText: {
     fontSize: 20,
@@ -93,6 +94,10 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  sectionItemView: {
+    marginRight: -132,    //147 is the difference = 0
+    width: screenWidth * 0.75 * fontScaler,
   },
   innerContainerView: {
     marginTop: 20,
@@ -204,16 +209,17 @@ const styles = StyleSheet.create({
     width: "65%",
     aspectRatio: 1,
     marginBottom: 5,
- 
+
   },
+  
 });
 
 const getTotal = (items) => {
-    let total = 0;
-    for (let i = 0; i < items.length; i++) {
-        total = total + items[i].price * items[i].quantity
-    }
-    return total;
+  let total = 0;
+  for (let i = 0; i < items.length; i++) {
+    total = total + items[i].price * items[i].quantity
+  }
+  return total;
 };
 
 function HomeComponent({ navigation }) {
@@ -267,6 +273,43 @@ function HomeComponent({ navigation }) {
     },
   });
 
+  const {
+    loading: getTopSellerItemsLoading,
+    error: getTopSellerItemsError,
+    data: getTopSellerItemsData,
+  } = useGetItemsBySectionQuery({
+    fetchPolicy: "cache-and-network",
+    variables: {
+      getItemsBySectionInput: {
+        userId: user.id,
+        value: "top_seller",
+        pagination: {
+          offset: 0,
+          limit: 20,
+        },
+      },
+    },
+  });
+
+  const {
+    loading: getOrderAgainItemsLoading,
+    error: getOrderAgainItemsError,
+    data: getOrderAgainItemsData,
+  } = useGetItemsBySectionQuery({
+    fetchPolicy: "cache-and-network",
+    variables: {
+      getItemsBySectionInput: {
+        userId: user.id,
+        value: "order_again",
+        pagination: {
+          offset: 0,
+          limit: 20,
+        },
+      },
+    },
+  });
+
+
 
   if (getOrdersLoading && !getOrdersData) return <Text>Loading</Text>;
   if (getOrdersError) return <Text>{getOrdersError.message}</Text>;
@@ -276,6 +319,12 @@ function HomeComponent({ navigation }) {
 
   if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
+
+  if (getTopSellerItemsLoading && !getTopSellerItemsData) return <Text>Loading</Text>;
+  if (getTopSellerItemsError) return <Text>{getTopSellerItemsError.message}</Text>;
+
+  if (getOrderAgainItemsLoading && !getOrderAgainItemsData) return <Text>Loading</Text>;
+  if (getOrderAgainItemsError) return <Text>{getOrderAgainItemsError.message}</Text>;
 
 
   const orderPressed = async (order) => {
@@ -291,8 +340,8 @@ function HomeComponent({ navigation }) {
 
   const searchBarPressed = async () => {
     navigation.navigate("SearchResults");
-      await Amplitude.logEventAsync('SEARCH_CLICKED')
-    
+    await Amplitude.logEventAsync('SEARCH_CLICKED')
+
   };
 
 
@@ -305,10 +354,11 @@ function HomeComponent({ navigation }) {
     await Amplitude.logEventAsync('CATEGORY_CLICKED')
   };
 
+
   const renderItem = ({ item }) => (
-    <ItemCard item={item} screenName="home"/>
+    <ItemCard item={item} screenName="home" />
   )
-  
+
   return (
     <View style={styles.homeContainer}>
       <SafeAreaView style={styles.container}>
@@ -327,7 +377,7 @@ function HomeComponent({ navigation }) {
                     style={{ position: "absolute", top: 10, right: 20 }}
                     onPress={logoutButtonPressed}
                   >
-                    <View style={{backgroundColor:"#D3D3D3", padding: 7, borderRadius: 10}}>
+                    <View style={{ backgroundColor: "#D3D3D3", padding: 7, borderRadius: 10 }}>
                       <Text maxFontSizeMultiplier={1.4}>Logout</Text>
                     </View>
                   </TouchableOpacity>
@@ -370,10 +420,10 @@ function HomeComponent({ navigation }) {
               </View>
 
               <View style={styles.orderSectionView}>
-                <View style={{marginHorizontal: 20}}>
-                <Text maxFontSizeMultiplier={1.4} style={[styles.titleText]}>
-                  Top Categories
-                </Text>
+                <View style={{ marginHorizontal: 20 }}>
+                  <Text maxFontSizeMultiplier={1.4} style={[styles.titleText]}>
+                    Top Categories
+                  </Text>
                 </View>
                 <ScrollView style={styles.scrollView} horizontal={true}>
                   {getCategoriesData.categories.map((category) => {
@@ -398,7 +448,7 @@ function HomeComponent({ navigation }) {
                             maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
-                              { textAlign: "center", flex: 1},
+                              { textAlign: "center", flex: 1 },
                             ]}
                           >
                             {category.name}
@@ -410,15 +460,15 @@ function HomeComponent({ navigation }) {
                 </ScrollView>
               </View>
               <View style={styles.orderSectionView}>
-                <View style={{marginHorizontal: 20}}>
-                <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
-                  Recent Orders
-                </Text>
-                <Text maxFontSizeMultiplier={1.4} style={[styles.mutedBodyTextSmall]}>
-                  {getOrdersData.orders.length > 1
-                    ? "Click To See Detail"
-                    : "No orders yet"}
-                </Text>
+                <View style={{ marginHorizontal: 20 }}>
+                  <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
+                    Recent Orders
+                  </Text>
+                  <Text maxFontSizeMultiplier={1.4} style={[styles.mutedBodyTextSmall]}>
+                    {getOrdersData.orders.length > 1
+                      ? "Click To See Detail"
+                      : "No orders yet"}
+                  </Text>
                 </View>
                 <ScrollView
                   style={styles.scrollView}
@@ -433,7 +483,7 @@ function HomeComponent({ navigation }) {
                       >
                         <View>
                           <Text
-                           maxFontSizeMultiplier={1.4}
+                            maxFontSizeMultiplier={1.4}
                             style={[
                               styles.bodyText,
                               { textAlign: "left", marginBottom: 5 },
@@ -442,7 +492,7 @@ function HomeComponent({ navigation }) {
                             {new Date(order.date_submitted).toDateString()}
                           </Text>
                           <Text
-                           maxFontSizeMultiplier={1.4}
+                            maxFontSizeMultiplier={1.4}
                             style={[
                               styles.mutedBodyTextSmall,
                               { textAlign: "left", marginBottom: 5 },
@@ -462,12 +512,12 @@ function HomeComponent({ navigation }) {
                           </Text>
                           <Text
                             style={[
-                            styles.bodyText,
-                            { textAlign: "left", marginBottom: 0 },
+                              styles.bodyText,
+                              { textAlign: "left", marginBottom: 0 },
                             ]}
-                        >
+                          >
                             Est. Delivery
-                        </Text>
+                          </Text>
                         </View>
                         <View>
                           <Text
@@ -500,23 +550,70 @@ function HomeComponent({ navigation }) {
                           </Text>
                           <Text
                             style={[
-                            styles.bodyText,
-                            { textAlign: "left", marginBottom: 0 },
+                              styles.bodyText,
+                              { textAlign: "left", marginBottom: 0 },
                             ]}
-                        >
+                          >
                             {format(add(new Date(order.date_submitted), { days: 1 }), "MM/dd/yyyy")}
-                        </Text>
-                          
+                          </Text>
+
                         </View>
                       </TouchableOpacity>
                     );
                   })}
                 </ScrollView>
               </View>
-              <View style={styles.orderSectionView}>
-                <View style={{marginHorizontal: 20}}>
 
-                <Text maxFontSizeMultiplier={1.4} style={styles.titleText}>Price Book</Text>
+              <View style={styles.orderSectionView}>
+                <View style={{ marginHorizontal: 20 }}>
+                  <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
+                    Recommended For You
+                  </Text>
+                </View>
+                <ScrollView
+                  style={styles.scrollView}
+                  horizontal={true}
+                >
+                  {getTopSellerItemsData.itemsBySection.map((item) => {
+                    return (
+                      <TouchableOpacity
+                        style={styles.sectionItemView}
+                        key={item.id}
+                      >
+                        <ItemCard item={item} screenName="home" syle = {styles.test}/>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+
+              <View style={styles.orderSectionView}>
+                <View style={{ marginHorizontal: 20 }}>
+                  <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
+                    Buy It Again
+                  </Text>
+                </View>
+                <ScrollView
+                  style={styles.scrollView}
+                  horizontal={true}
+                >
+                  {getOrderAgainItemsData.itemsBySection.map((item) => {
+                    return (
+                      <TouchableOpacity
+                        style={styles.sectionItemView}
+                        key={item.id}
+                      >
+                        <ItemCard item={item} screenName="home"/>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+
+              <View style={styles.orderSectionView}>
+                <View style={{ marginHorizontal: 20 }}>
+
+                  <Text maxFontSizeMultiplier={1.4} style={styles.titleText}>Price Book</Text>
                 </View>
               </View>
             </>

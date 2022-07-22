@@ -1,0 +1,6 @@
+query GetSections($getSectionsInput: GetSectionsInput) {
+  categories(getSectionsInput: $getSectionsInput) {
+    name
+    value
+  }
+}

@@ -57,6 +57,12 @@ export type Category = {
   value?: Maybe<Scalars["String"]>;
 };
 
+export type Section = {
+  __typename?: "Section";
+  name?: Maybe<Scalars["String"]>;
+  value?: Maybe<Scalars["String"]>;
+};
+
 export type CreateCartInput = {
   userId: Scalars["ID"];
 };
@@ -76,10 +82,20 @@ export type GetCategoriesInput = {
   pagination?: InputMaybe<PaginationInput>;
 };
 
+export type GetSectionsInput = {
+  pagination?: InputMaybe<PaginationInput>;
+}
+
 export type GetItemsByFilterInput = {
   category?: InputMaybe<Scalars["String"]>;
   pagination?: InputMaybe<PaginationInput>;
   tag?: InputMaybe<Scalars["String"]>;
+};
+
+export type GetItemsBySectionInput = {
+  userId?: InputMaybe<Scalars["ID"]>;
+  value?: InputMaybe<Scalars["String"]>;
+  pagination?: InputMaybe<PaginationInput>;
 };
 
 export type GetItemsInput = {
@@ -167,6 +183,10 @@ export type QueryCategoriesArgs = {
   getCategoriesInput?: InputMaybe<GetCategoriesInput>;
 };
 
+export type QuerySectionsArgs = {
+  getSectionsInput?: InputMaybe<GetSectionsInput>;
+};
+
 export type QueryItemsArgs = {
   getItemsInput?: InputMaybe<GetItemsInput>;
 };
@@ -174,6 +194,10 @@ export type QueryItemsArgs = {
 export type QueryItemsByFilterArgs = {
   getItemsByFilterInput?: InputMaybe<GetItemsByFilterInput>;
 };
+
+export type QueryItemsBySectionArgs = {
+  getItemsBySectionInput?: InputMaybe<GetItemsBySectionInput>;
+}
 
 export type QueryOrdersArgs = {
   getOrdersInput?: InputMaybe<GetOrdersInput>;
@@ -264,6 +288,26 @@ export type GetItemsByFilterQueryVariables = Exact<{
 export type GetItemsByFilterQuery = {
   __typename?: "Query";
   itemsByFilter: Array<{
+    __typename?: "Item";
+    id: string;
+    name: string;
+    unit_size?: number | null;
+    price: number;
+    upc1?: string | null;
+    upc2?: string | null;
+    nacs_category?: string | null;
+    nacs_subcategory?: string | null;
+    image?: string | null;
+  } | null>;
+};
+
+export type GetItemsBySectionQueryVariables = Exact<{
+  getItemsBySectionInput?: InputMaybe<GetItemsBySectionInput>;
+}>;
+
+export type GetItemsBySectionQuery = {
+  __typename?: "Query";
+  itemsBySection: Array<{
     __typename?: "Item";
     id: string;
     name: string;
@@ -370,6 +414,19 @@ export type GetCategoriesQuery = {
     name?: string | null;
     value?: string | null;
     image?: string | null;
+  } | null>;
+};
+
+export type GetSectionsQueryVariables = Exact<{
+  getSectionsInput?: InputMaybe<GetSectionsInput>;
+}>;
+
+export type GetSectionsQuery = {
+  __typename?: "Query";
+  sections: Array<{
+    __typename?: "Section";
+    name?: string | null;
+    value?: string | null;
   } | null>;
 };
 
@@ -579,6 +636,74 @@ export type GetItemsByFilterQueryResult = Apollo.QueryResult<
   GetItemsByFilterQuery,
   GetItemsByFilterQueryVariables
 >;
+
+export const GetItemsBySectionDocument = gql`
+  query GetItemsBySection($getItemsBySectionInput: GetItemsBySectionInput) {
+    itemsBySection(getItemsBySectionInput: $getItemsBySectionInput) {
+      id
+      name
+      unit_size
+      price
+      upc1
+      upc2
+      nacs_category
+      nacs_subcategory
+      image
+    }
+  }
+`;
+
+/**
+ * __useGetItemsBySectionQuery__
+ *
+ * To run a query within a React component, call `useGetItemsBySectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetItemsBySectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetItemsBySectionQuery({
+ *   variables: {
+ *      getItemsBySectionInput: // value for 'getItemsBySectionInput'
+ *   },
+ * });
+ */
+export function useGetItemsBySectionQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetItemsBySectionQuery,
+    GetItemsBySectionQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetItemsBySectionQuery, GetItemsBySectionQueryVariables>(
+    GetItemsBySectionDocument,
+    options
+  );
+}
+export function useGetItemsBySectionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetItemsBySectionQuery,
+    GetItemsBySectionQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetItemsBySectionQuery,
+    GetItemsBySectionQueryVariables
+  >(GetItemsBySectionDocument, options);
+}
+export type GetItemsBySectionQueryHookResult = ReturnType<
+  typeof useGetItemsBySectionQuery
+>;
+export type GetItemsBySectionLazyQueryHookResult = ReturnType<
+  typeof useGetItemsBySectionLazyQuery
+>;
+export type GetItemsBySectionQueryResult = Apollo.QueryResult<
+  GetItemsBySectionQuery,
+  GetItemsBySectionQueryVariables
+>;
+
 export const GetOrdersDocument = gql`
   query GetOrders($getOrdersInput: GetOrdersInput) {
     orders(getOrdersInput: $getOrdersInput) {
@@ -925,4 +1050,59 @@ export type GetTagsLazyQueryHookResult = ReturnType<typeof useGetTagsLazyQuery>;
 export type GetTagsQueryResult = Apollo.QueryResult<
   GetTagsQuery,
   GetTagsQueryVariables
+>;
+
+export const GetSectionsDocument = gql`
+  query GetSections($getSectionsInput: GetSectionsInput) {
+    categories(getSectionsInput: $getSectionsInput) {
+      name
+      value
+    }
+  }
+`;
+
+/**
+ * __useGetSectionsQuery__
+ *
+ * To run a query within a React component, call `useGetSectionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSectionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSectionsQuery({
+ *   variables: {
+ *      getSectionsInput: // value for 'getSectionsInput'
+ *   },
+ * });
+ */
+export function useGetSectionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetSectionsQuery, GetSectionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetSectionsQuery, GetSectionsQueryVariables>(
+    GetSectionsDocument,
+    options
+  );
+}
+export function useGetSectionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetSectionsQuery,
+    GetSectionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetSectionsQuery, GetSectionsQueryVariables>(
+    GetSectionsDocument,
+    options
+  );
+}
+export type GetSectionsQueryHookResult = ReturnType<typeof useGetSectionsQuery>;
+export type GetSectionsLazyQueryHookResult = ReturnType<
+  typeof useGetSectionsLazyQuery
+>;
+export type GetSectionsQueryResult = Apollo.QueryResult<
+  GetSectionsQuery,
+  GetSectionsQueryVariables
 >;
