@@ -225,7 +225,6 @@ export default function ItemDetailScreen({ navigation, route }) {
         </View>
       )}
       <View style={styles.safeContainer}>
-        <Text style={styles.boldMainText}>{item.name}</Text>
         <View style={styles.itemContainer}>
           <Image style={styles.itemImage} source={{ uri: item.image }} />
           <View style={styles.itemTextContainer}>

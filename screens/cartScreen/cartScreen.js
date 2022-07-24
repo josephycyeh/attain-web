@@ -251,7 +251,12 @@ const areAllSelected = (obj) => {
     for (var key in obj) {
         temp.push(obj[key]);
     }
-    return temp.every(elem => elem === true);
+    for (let i = 0; i < temp.length; i++) {
+        if (!temp[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 const test = (obj, key) => {
