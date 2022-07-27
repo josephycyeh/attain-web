@@ -1,5 +1,5 @@
 query GetSections($getSectionsInput: GetSectionsInput) {
-  categories(getSectionsInput: $getSectionsInput) {
+  sections(getSectionsInput: $getSectionsInput) {
     name
     value
   }

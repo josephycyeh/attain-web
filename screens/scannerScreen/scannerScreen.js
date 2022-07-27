@@ -110,7 +110,7 @@ function ScannerScreenComponent({ navigation }) {
     return unsubscribe;
   }, [navigation]);
   const handleBarCodeScanned = async ({ type, data }) => {
-    await Amplitude.logEventAsync('SCANNED_ITEM');
+    await Amplitude.logEventWithPropertiesAsync('SCANNED_ITEM', {upcCode: data});
     setScanned(true);
     navigation.navigate("ItemDetail", {
       upcCode: data,

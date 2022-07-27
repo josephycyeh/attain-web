@@ -19,6 +19,7 @@ import {
   useGetOrdersQuery,
   useGetCategoriesQuery,
   useGetItemsBySectionQuery,
+  useGetSectionsQuery
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
 
   },
-  
+
 });
 
 const getTotal = (items) => {
@@ -309,6 +310,22 @@ function HomeComponent({ navigation }) {
     },
   });
 
+  const {
+    loading: getSectionsLoading,
+    error: getSectionsError,
+    data: getSectionsData,
+  } = useGetSectionsQuery({
+    fetchPolicy: "cache-and-network",
+    variables: {
+      getSectionsInput: {
+        pagination: {
+          offset: 0,
+          limit: 20,
+        },
+      },
+    },
+  });
+
 
 
   if (getOrdersLoading && !getOrdersData) return <Text>Loading</Text>;
@@ -325,6 +342,9 @@ function HomeComponent({ navigation }) {
 
   if (getOrderAgainItemsLoading && !getOrderAgainItemsData) return <Text>Loading</Text>;
   if (getOrderAgainItemsError) return <Text>{getOrderAgainItemsError.message}</Text>;
+
+  if (getSectionsLoading && !getSectionsData) return <Text>Loading</Text>;
+  if (getSectionsError) return <Text>{getSectionsError.message}</Text>;
 
 
   const orderPressed = async (order) => {
@@ -564,6 +584,8 @@ function HomeComponent({ navigation }) {
                 </ScrollView>
               </View>
 
+              
+
               <View style={styles.orderSectionView}>
                 <View style={{ marginHorizontal: 20 }}>
                   <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
@@ -580,7 +602,7 @@ function HomeComponent({ navigation }) {
                         style={styles.sectionItemView}
                         key={item.id}
                       >
-                        <ItemCard item={item} screenName="home" syle = {styles.test}/>
+                        <ItemCard item={item} screenName="home" syle={styles.test} />
                       </TouchableOpacity>
                     );
                   })}
@@ -603,12 +625,54 @@ function HomeComponent({ navigation }) {
                         style={styles.sectionItemView}
                         key={item.id}
                       >
-                        <ItemCard item={item} screenName="home"/>
+                        <ItemCard item={item} screenName="home" />
                       </TouchableOpacity>
                     );
                   })}
                 </ScrollView>
               </View>
+
+
+              {/* {getSectionsData.sections.map((section) => {
+                return (
+                  <View style={styles.orderSectionView}>
+                    <View style={{ marginHorizontal: 20 }}>
+                      <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
+                        {section.name}
+                      </Text>
+                    </View>
+                    <ScrollView
+                      style={styles.scrollView}
+                      horizontal={true}
+                    >
+                      {getOrderAgainItemsData.itemsBySection.map((item) => {
+                        return (
+                          <TouchableOpacity
+                            style={styles.sectionItemView}
+                            key={item.id}
+                          >
+                            <ItemCard item={item} screenName="home" />
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+
+                  </View>
+                );
+              })} */}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
               <View style={styles.orderSectionView}>
                 <View style={{ marginHorizontal: 20 }}>
