@@ -18,8 +18,7 @@ import {
   useGetItemsQuery,
   useGetOrdersQuery,
   useGetCategoriesQuery,
-  useGetItemsBySectionQuery,
-  useGetSectionsQuery
+  useSectionsQuery
 } from "../../generated/graphql";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
 import OrderDetailScreen from "../orderDetailScreen/orderDetailScreen";
@@ -274,55 +273,19 @@ function HomeComponent({ navigation }) {
     },
   });
 
-  // const {
-  //   loading: getTopSellerItemsLoading,
-  //   error: getTopSellerItemsError,
-  //   data: getTopSellerItemsData,
-  // } = useGetItemsBySectionQuery({
-  //   fetchPolicy: "cache-and-network",
-  //   variables: {
-  //     getItemsBySectionInput: {
-  //       userId: user.id,
-  //       value: "top_seller",
-  //       pagination: {
-  //         offset: 0,
-  //         limit: 20,
-  //       },
-  //     },
-  //   },
-  // });
-
-  // const {
-  //   loading: getOrderAgainItemsLoading,
-  //   error: getOrderAgainItemsError,
-  //   data: getOrderAgainItemsData,
-  // } = useGetItemsBySectionQuery({
-  //   fetchPolicy: "cache-and-network",
-  //   variables: {
-  //     getItemsBySectionInput: {
-  //       userId: user.id,
-  //       value: "order_again",
-  //       pagination: {
-  //         offset: 0,
-  //         limit: 20,
-  //       },
-  //     },
-  //   },
-  // });
-
   const {
     loading: getSectionsLoading,
     error: getSectionsError,
     data: getSectionsData,
-  } = useGetSectionsQuery({
+  } = useSectionsQuery({
     fetchPolicy: "cache-and-network",
     variables: {
       getSectionsInput: {
-        userId: user.id,
         pagination: {
           offset: 0,
           limit: 10,
         },
+        userId: user.id
       },
     },
   });
@@ -337,12 +300,6 @@ function HomeComponent({ navigation }) {
 
   if (getCategoriesLoading && !getCategoriesData) return <Text>Loading</Text>;
   if (getCategoriesError) return <Text>{getCategoriesError.message}</Text>;
-
-  // if (getTopSellerItemsLoading && !getTopSellerItemsData) return <Text>Loading</Text>;
-  // if (getTopSellerItemsError) return <Text>{getTopSellerItemsError.message}</Text>;
-
-  // if (getOrderAgainItemsLoading && !getOrderAgainItemsData) return <Text>Loading</Text>;
-  // if (getOrderAgainItemsError) return <Text>{getOrderAgainItemsError.message}</Text>;
 
   if (getSectionsLoading && !getSectionsData) return <Text>Loading</Text>;
   if (getSectionsError) return <Text>{getSectionsError.message}</Text>;
@@ -585,55 +542,6 @@ function HomeComponent({ navigation }) {
                 </ScrollView>
               </View>
 
-{/*               
-
-              <View style={styles.orderSectionView}>
-                <View style={{ marginHorizontal: 20 }}>
-                  <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
-                    Recommended For You
-                  </Text>
-                </View>
-                <ScrollView
-                  style={styles.scrollView}
-                  horizontal={true}
-                >
-                  {getTopSellerItemsData.itemsBySection.map((item) => {
-                    return (
-                      <TouchableOpacity
-                        style={styles.sectionItemView}
-                        key={item.id}
-                      >
-                        <ItemCard item={item} screenName="home" syle={styles.test} />
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-
-              <View style={styles.orderSectionView}>
-                <View style={{ marginHorizontal: 20 }}>
-                  <Text maxFontSizeMultiplier={1.4} style={[styles.titleText, { marginBottom: 5 }]}>
-                    Buy It Again
-                  </Text>
-                </View>
-                <ScrollView
-                  style={styles.scrollView}
-                  horizontal={true}
-                >
-                  {getOrderAgainItemsData.itemsBySection.map((item) => {
-                    return (
-                      <TouchableOpacity
-                        style={styles.sectionItemView}
-                        key={item.id}
-                      >
-                        <ItemCard item={item} screenName="home" />
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View> */}
-
-
               {getSectionsData.sections.map((section) => {
                 return (
                   <View style={styles.orderSectionView}>
@@ -646,7 +554,7 @@ function HomeComponent({ navigation }) {
                       style={styles.scrollView}
                       horizontal={true}
                     >
-                      {getSectionsData.sections.items.map((item) => {
+                      {section.items.map((item) => {
                         return (
                           <TouchableOpacity
                             style={styles.sectionItemView}
@@ -657,10 +565,10 @@ function HomeComponent({ navigation }) {
                         );
                       })}
                     </ScrollView>
-
                   </View>
                 );
               })}
+
 
 
 

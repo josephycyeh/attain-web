@@ -1,7 +1,18 @@
-query GetSections($getSectionsInput: GetSectionsInput) {
+query Sections($getSectionsInput: GetSectionsInput) {
   sections(getSectionsInput: $getSectionsInput) {
-    name
     value
-    items
+    name
+    items {
+      id
+      name
+      price
+      unit_size
+      upc1
+      upc2
+      nacs_category
+      nacs_subcategory
+      image
+    }
+    
   }
 }
