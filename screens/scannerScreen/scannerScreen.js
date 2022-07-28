@@ -7,14 +7,21 @@ import {
   ScrollView,
   StatusBar,
   Button,
+  TouchableOpacity,
   PixelRatio
 } from "react-native";
+import { Icon } from 'react-native-elements'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Amplitude from 'expo-analytics-amplitude';
 import { BarCodeScanner } from "expo-barcode-scanner";
 import ItemDetailScreen from "../itemDetailScreen/itemDetailScreen";
+library.add(fas);
+
 const opacity = "rgba(0, 0, 0, .6)";
 
 const fontScale = PixelRatio.getFontScale()
@@ -66,33 +73,85 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   layerTop: {
-    flex: 1,
+    flex: 1.5,
     backgroundColor: opacity,
   },
   layerCenter: {
-    flex: 1,
+    flex: 2,
     flexDirection: "row",
   },
   layerLeft: {
-    flex: 1,
+    flex: 3,
     backgroundColor: opacity,
   },
   focused: {
-    flex: 10,
+    flex: 8,
+    justifyContent: "center",
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "#FFFFFF",
+    overflow: "hidden",
+    position: "relative",
   },
   layerRight: {
-    flex: 1,
+    flex: 3,
     backgroundColor: opacity,
   },
   layerBottom: {
-    flex: 1,
+    flex: 2.5,
     backgroundColor: opacity,
   },
+  headerContainer: {
+    zIndex: 5,
+    justifyContent: "space-between",
+    paddingHorizontal: 35,
+    flexDirection: "row",
+    top: 0,
+    width: "100%",
+    height: 65,
+  },
+  deleteButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 30,
+    width: 60,
+  },
+  closeText: {
+    marginLeft: 10,
+    fontSize: 15,
+    fontWeight: "600",
+    justifyContent: "center"
+  },
+  helpIcon: {
+    marginRight: 10,
+  },
+  barCodeTab: {
+    zIndex: 5,
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "column",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: "15%",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    backgroundColor: "white",
+  },
+  mainInstructionText: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
+
 });
 
 function ScannerScreenComponent({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const [flash, setFlash] = useState(false);
+  const [modal, setModal] = useState(false);
 
   useEffect(async () => {
     
@@ -117,6 +176,14 @@ function ScannerScreenComponent({ navigation }) {
     });
   };
 
+  const goToHome = () => {
+    navigation.navigate("Home")
+  }
+
+  const onClickFlash = () => {
+    setFlash(!flash);
+  }
+
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
   }
@@ -126,6 +193,30 @@ function ScannerScreenComponent({ navigation }) {
 
   return (
     <View style={styles.container}>
+        <View style={styles.headerContainer}>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+                <TouchableOpacity onPress={goToHome}>
+                    <FontAwesomeIcon icon="fa-solid fa-arrow-left" />
+                </TouchableOpacity>
+            </View>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+                { flash ? (
+                    <TouchableOpacity onPress={onClickFlash}>
+                        <FontAwesomeIcon icon="fa-solid fa-bolt" />
+                    </TouchableOpacity>
+                ): (
+                    <TouchableOpacity onPress={onClickFlash}>
+                        <FontAwesomeIcon icon="fa-solid fa-bolt" />
+                    </TouchableOpacity>
+                )}
+                
+            </View>
+      </View>
+      <View style={styles.barCodeTab}>
+          <Text style={styles.mainInstructionText}>Point at barcode to scan</Text>
+          <Text style={{fontSize: 14}}>Hold the phone steady.</Text>
+          <Text style={{fontSize: 14}}>Focus barcode in view window.</Text>
+      </View>
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
@@ -133,7 +224,8 @@ function ScannerScreenComponent({ navigation }) {
         <View style={styles.layerTop} />
         <View style={styles.layerCenter}>
           <View style={styles.layerLeft} />
-          <View style={styles.focused} />
+          <View style={styles.focused}>
+          </View>
           <View style={styles.layerRight} />
         </View>
         <View style={styles.layerBottom} />
