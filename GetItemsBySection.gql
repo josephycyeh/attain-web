@@ -1,0 +1,13 @@
+query GetItemsBySection($getItemsBySectionInput: GetItemsBySectionInput) {
+  itemsBySection(getItemsBySectionInput: $getItemsBySectionInput) {
+    id
+    name
+    unit_size
+    price
+    upc1
+    upc2
+    nacs_category
+    nacs_subcategory
+    image
+  }
+}

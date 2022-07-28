@@ -1,0 +1,18 @@
+query Sections($getSectionsInput: GetSectionsInput) {
+  sections(getSectionsInput: $getSectionsInput) {
+    value
+    name
+    items {
+      id
+      name
+      price
+      unit_size
+      upc1
+      upc2
+      nacs_category
+      nacs_subcategory
+      image
+    }
+    
+  }
+}
