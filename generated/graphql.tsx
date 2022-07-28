@@ -61,6 +61,7 @@ export type Section = {
   __typename?: "Section";
   name?: Maybe<Scalars["String"]>;
   value?: Maybe<Scalars["String"]>;
+  items?: Maybe<Array<Maybe<Item>>>;
 };
 
 export type CreateCartInput = {
@@ -83,6 +84,7 @@ export type GetCategoriesInput = {
 };
 
 export type GetSectionsInput = {
+  userId: Scalars["ID"];
   pagination?: InputMaybe<PaginationInput>;
 }
 
@@ -427,7 +429,20 @@ export type GetSectionsQuery = {
     __typename?: "Section";
     name?: string | null;
     value?: string | null;
+    items?: Array<{
+      __typename?: "Item";
+      id: string;
+      name: string;
+      unit_size?: number | null;
+      price: number;
+      upc1?: string | null;
+      upc2?: string | null;
+      nacs_category?: string | null;
+      nacs_subcategory?: string | null;
+      image?: string | null;
+    } | null>;
   } | null>;
+  
 };
 
 export type GetTagsQueryVariables = Exact<{

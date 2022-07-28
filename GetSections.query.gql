@@ -2,5 +2,6 @@ query GetSections($getSectionsInput: GetSectionsInput) {
   sections(getSectionsInput: $getSectionsInput) {
     name
     value
+    items
   }
 }
