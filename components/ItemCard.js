@@ -153,7 +153,7 @@ const ItemCard = ({ item, highlighted, screenName }) => {
 
 
   const cart = user.cart;
-  const addItemToCart = (item) => {
+  const addItemToCart = async (item) => {
     await Amplitude.logEventWithPropertiesAsync('ADD_ITEM_SIMPLE_CLICKED', {screen: screenName, itemId: item.id});
     setModalVisible(true)
   };
