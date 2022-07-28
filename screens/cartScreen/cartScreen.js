@@ -8,8 +8,10 @@ import {
   Button,
   TouchableOpacity,
   Image,
-  PixelRatio
+  PixelRatio,
 } from "react-native";
+import { Icon } from 'react-native-elements'
+import Checkbox from "expo-checkbox";
 import { NavigationContainer } from "@react-navigation/native";
 import Text from '../../components/Text'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -71,12 +73,6 @@ const styles = StyleSheet.create({
   itemImage: {
     width: 120,
     height: 120,
-  },
-  itemContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 10,
-    marginBottom: 100,
   },
   boldMainText: {
     fontSize: 20,
@@ -141,11 +137,11 @@ const styles = StyleSheet.create({
   boldMainTextColor: {
     fontSize: 25,
     fontWeight: "600",
-    color: "#3C95FF",
+    color: "#88BEFF",
   },
   checkoutButton: {
     backgroundColor: "white",
-    width: 150,
+    width: 170,
     height: "80%",
     justifyContent: "center",
     alignItems: "center",
@@ -154,7 +150,7 @@ const styles = StyleSheet.create({
   checkoutButtonText: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#3C95FF",
+    color: "#88BEFF",
     textAlign: "center",
   },
   secondaryTitleText: {
@@ -165,19 +161,81 @@ const styles = StyleSheet.create({
   },
   itemsContainer: {
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 30,
   },
   itemContainer: {
-    borderStyle: "solid",
-    borderWidth: 1,
+    flex: 1,
+    justifyContent: "space-between",
+    paddingVertical: 10
+  },
+  itemName: {
+    marginTop: 0,
+    marginBottom: 10,
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  itemContent: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
-    borderRadius: 20,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 10,
   },
+  itemTotalCost: {
+    marginLeft: "auto", 
+    marginRight: "auto",
+    marginTop: 10
+  },
+  withCheckBoxContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    borderStyle: "solid",
+    borderTopWidth: 0.5,
+  },
+  checkBox: {
+    marginRight: 10,
+    justifyContent: "center"
+  },
+  itemManagement: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  deleteButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: 60,
+  },
+  selectAllText: {
+    marginLeft: 10,
+    fontSize: 15,
+    fontWeight: "600",
+    justifyContent: "center"
+  },
+  addItemsButton: {
+    textAlign: "center",
+    fontSize: 15,
+    fontWeight: "600",
+    marginRight: 5
+  },
+  addItemsContainer: {
+    borderTopWidth: 0.5,
+    marginTop: 0,
+    paddingTop: 15,
+    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  addItemsContainerNoItems: {
+    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  quantityText: {
+    // borderWidth: 0.5,
+    width: 20,
+    height: 20,
+    fontSize: 15,
+    textAlign: "center",
+    justifyContent: "center"
+  }
 });
 
 const getTotal = (items) => {
@@ -185,8 +243,25 @@ const getTotal = (items) => {
     for (let i = 0; i < items.length; i++) {
         total = total + items[i].price * items[i].quantity
     }
-    return total;
+    return Math.round(total*100)/100;
 };
+
+const areAllSelected = (obj) => {
+    let temp = []
+    for (var key in obj) {
+        temp.push(obj[key]);
+    }
+    for (let i = 0; i < temp.length; i++) {
+        if (!temp[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+const test = (obj, key) => {
+    return obj[key] === true;
+}
 
 function CartScreenComponent({ navigation }) {
   const { isLoggedIn, setIsLoggedIn, user } = useContext(UserContext);
@@ -213,12 +288,20 @@ function CartScreenComponent({ navigation }) {
   if (error) return <Text>Error.....</Text>;
 
   const cart = data.carts[0];
-//   const total = getCartTotal(cart.cartItems);
+  let temp = {};
+  for (let i = 0; i < cart.cartItems.length; i++) {
+    temp[cart.cartItems[i].id] = false
+  }
+  const [checks, setChecks] = useState(temp);
+  
   const goToCheckout = () => {
     navigation.navigate("CheckoutScreen", {
       cartId: cart.id,
     });
   };
+  const goToHome = () => {
+    navigation.navigate("Home")
+  }
 
   const onEditQuantity = (cartId, itemId, quantity) => {
     updateItemInCart({
@@ -231,6 +314,50 @@ function CartScreenComponent({ navigation }) {
       },
     });
   };
+  const checkSingleItem = (index) => {
+    let newChecks = {};
+    for (let i = 0; i < cart.cartItems.length; i++) {
+        if (cart.cartItems[i].id === index) {
+            newChecks[cart.cartItems[i].id] = !checks[cart.cartItems[i].id]
+        } else {
+            newChecks[cart.cartItems[i].id] = checks[cart.cartItems[i].id]
+        }
+    }
+    setChecks(newChecks);
+  }
+
+  const checkAllItems = () => {
+    let temp = []
+    for (var key in checks) {
+        temp.push(checks[key]);
+    }
+    let newChecks = {};
+    if (temp.every(elem => elem === true)) {
+        for (let i = 0; i < cart.cartItems.length; i++) {
+            newChecks[cart.cartItems[i].id] = false
+        }
+        setChecks(newChecks);
+    } else {
+        for (let i = 0; i < cart.cartItems.length; i++) {
+            newChecks[cart.cartItems[i].id] = true
+        }
+        setChecks(newChecks);
+    }
+  }
+  const deleteItems = () => {
+    for (var key in checks) {
+        if (checks[key]) {
+            let item_id;
+            for (let i = 0; i < cart.cartItems.length; i++) {
+                if (cart.cartItems[i].id == key) {
+                    item_id = cart.cartItems[i].item_id;
+                    break;
+                }
+            }
+            onEditQuantity(cart.id, item_id, 0)
+        }
+      }
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View
@@ -244,9 +371,9 @@ function CartScreenComponent({ navigation }) {
           bottom: 0,
           width: "100%",
           height: 65,
-          backgroundColor: "#3C95FF",
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
+          backgroundColor: "#88BEFF",
+        //   borderTopLeftRadius: 10,
+        //   borderTopRightRadius: 10,
         }}
       >
         <View
@@ -256,7 +383,7 @@ function CartScreenComponent({ navigation }) {
             flexDirection: "column",
           }}
         >
-          <Text style={styles.boldMainText}>Subtotal</Text>
+          <Text style={styles.boldMainText}>Total Payment</Text>
           <Text style={styles.boldMainText}>${getTotal(cart.cartItems)}</Text>
         </View>
         <View
@@ -271,7 +398,7 @@ function CartScreenComponent({ navigation }) {
               style={styles.checkoutButton}
               onPress={goToCheckout}
             >
-              <Text style={styles.checkoutButtonText}>Continue</Text>
+              <Text style={styles.checkoutButtonText}>Check Out</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -279,7 +406,6 @@ function CartScreenComponent({ navigation }) {
 
       <ScrollView style={styles.scrollView}>
         <View style={styles.itemsContainer}>
-          <Text style={styles.secondaryTitleText}>Items</Text>
           {cart.cartItems.length == 0 && (
             <View style={{ marginTop: "50%" }}>
               <Text
@@ -287,69 +413,124 @@ function CartScreenComponent({ navigation }) {
               >
                 No Items In Cart
               </Text>
-              <Text
-                style={[
-                  styles.thirdTitleText,
-                  { marginTop: "5%", textAlign: "center" },
-                ]}
-              >
-                Add Items To Cart To Checkout
-              </Text>
+            </View>
+          )}
+          {cart.cartItems.length !== 0 && (
+             <View style={styles.itemManagement}>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Checkbox
+                        value={areAllSelected(checks)}
+                        onValueChange={checkAllItems}
+                        color={true ? '#88BEFF' : undefined} 
+                    />
+                    <Text style={styles.selectAllText}>
+                        Select all items
+                    </Text>
+                </View>
+                <TouchableOpacity style={styles.deleteButton} onPress={deleteItems}>
+                    <Text style={{textDecorationLine: 'underline'}}>Delete</Text>
+                </TouchableOpacity>
             </View>
           )}
           {cart.cartItems.map((cartItem) => {
             return (
-              <View key={cartItem.id} style={styles.itemContainer}>
-                <View>
-                  <Text style={styles.boldSecondaryText}>{cartItem.name}</Text>
-                  <Text style={styles.boldSecondaryText}>
-                    Sku#: {cartItem.id}
-                  </Text>
-                  <Text style={styles.boldSecondaryText}>
-                    Unit Size: {cartItem.unit_size}
-                  </Text>
-                  <Text style={styles.boldSecondaryText}>
-                    Price: {cartItem.price}
-                  </Text>
+              <View key={cartItem.id} style={styles.withCheckBoxContainer}>
+                <View style={styles.checkBox}>
+                    <Checkbox
+                        value={test(checks, cartItem.id)}  
+                        onValueChange={() => checkSingleItem(cartItem.id)}
+                        color={checks[cartItem.id] ? '#88BEFF' : undefined}
+                    />
                 </View>
-               
+              <View key={cartItem.id} style={styles.itemContainer}>
+                <View style={styles.itemName}>
+                    <Text>{cartItem.name}</Text>
+                </View>
+                <View style={styles.itemContent}>
+                
+                <Image style={styles.itemImage} 
+                    source={{
+                        uri: cartItem.image
+                        ? cartItem.image
+                        : "https://via.placeholder.com/150",
+                    }} />
+                <View style={styles.itemTextContainer}>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Sku#: {cartItem.id}
+                    </Text>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Unit Size: {cartItem.unit_size}ct
+                    </Text>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Case Cost: {cartItem.price}
+                    </Text>
+                    <Text style={[
+                        styles.boldSecondaryText,
+                        { textAlign: "left", marginBottom: 5 },
+                        ]}>
+                        Unit Cost: {Math.round(100*cartItem.price/cartItem.unit_size)/100}
+                    </Text>
+                </View>
                 <View
                   style={{
                     flexDirection: "column",
-                    justifyContent: "space-between",
-                    paddingVertical: 20
+                    justifyContent: "center",
+                    paddingVertical: 0,
                   }}
                 >
-                  <NumericInput
-                    initValue={cartItem.quantity}
-                    value={cartItem.quantity}
-                    totalHeight={30}
-                    totalWidth={80}
-                    rounded
-                    iconSize={100}
-                    leftButtonBackgroundColor={"#88BEFF"}
-                    rightButtonBackgroundColor={"#88BEFF"}
-                    onChange={(value) =>
-                      onEditQuantity(cart.id, cartItem.item_id, value)
-                    }
-                  />
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      backgroundColor: "grey",
-                      borderRadius: 5,
-                      padding: 2,
-                    }}
-                    onPress={() => onEditQuantity(cart.id, cartItem.item_id, 0)}
-                  >
-                    <Text>Delete</Text>
-                  </TouchableOpacity>
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <TouchableOpacity
+                        onPress={() => onEditQuantity(cart.id, cartItem.item_id, cartItem.quantity - 1)}
+                        >
+                        <Icon name="minus-box" type="material-community" color="#88BEFF" size={30}/>
+                    </TouchableOpacity>
+                    <View style={{marginLeft: "auto", marginRight: "auto",}}>
+                        <Text style={styles.quantityText}>{cartItem.quantity}</Text>
+                    </View>
+                    <TouchableOpacity
+                        onPress={() => onEditQuantity(cart.id, cartItem.item_id, cartItem.quantity + 1)}
+                        >
+                        <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.itemTotalCost}>
+                    ${Math.round(cartItem.price * cartItem.quantity * 100)/100}
+                  </Text>
                 </View>
                 </View>
-             
+                </View>
+                </View>
             );
           })}
+          {cart.cartItems.length == 0 ? (
+            <View style={styles.addItemsContainerNoItems}>
+            <TouchableOpacity
+                onPress={goToHome}
+                >
+                <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
+            </TouchableOpacity>
+            <Text style={styles.addItemsButton}>Add more items</Text>
+          </View>
+          ) : (
+            <View style={styles.addItemsContainer}>
+            <TouchableOpacity
+                onPress={goToHome}
+                >
+                <Icon name="plus-box" type="material-community" color="#88BEFF" size={30}/>
+            </TouchableOpacity>
+            <Text style={styles.addItemsButton}>Add more items</Text>
+          </View>
+          )}
+          
         </View>
       </ScrollView>
     </SafeAreaView>
